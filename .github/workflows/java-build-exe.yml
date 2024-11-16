@@ -1,40 +1,98 @@
-name: Build Java EXE
-
+name: Build and Package Java Application
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Set up JDK
+    - name: Set up Java
       uses: actions/setup-java@v3
       with:
+        distribution: 'zulu'
         java-version: '17'
-        distribution: 'temurin'
 
-    - name: Build with Maven
-      run: mvn clean package
-
-    - name: Download Launch4j
+    - name: Download and Setup Launch4j
+      shell: pwsh
       run: |
-        wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux-x64.tgz/download -O launch4j-linux.tgz
-        tar -xzf launch4j-linux.tgz
-        chmod +x launch4j-3.14/launch4j
+        try {
+            Write-Host "Downloading Launch4j..."
+            $url = "https://downloads.sourceforge.net/project/launch4j/launch4j-3.14-win32.zip"
+            $output = "launch4j.zip"
+            
+            # Download with retry logic
+            $maxRetries = 3
+            $retryCount = 0
+            $success = $false
+            
+            do {
+                try {
+                    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+                    Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
+                    $success = $true
+                }
+                catch {
+                    $retryCount++
+                    Write-Host "Download attempt $retryCount failed. Retrying..."
+                    Start-Sleep -Seconds 5
+                }
+            } while (-not $success -and $retryCount -lt $maxRetries)
+            
+            if (-not $success) {
+                throw "Failed to download Launch4j after $maxRetries attempts"
+            }
+            
+            Write-Host "Extracting Launch4j..."
+            Expand-Archive -Path $output -DestinationPath "launch4j" -Force
+            
+            # Verify the extraction
+            if (-not (Test-Path "launch4j\launch4j.exe")) {
+                throw "Launch4j.exe not found in extracted contents"
+            }
+            
+            # Add to path
+            $launch4jPath = Join-Path -Path $pwd -ChildPath "launch4j"
+            Write-Host "Adding to PATH: $launch4jPath"
+            echo $launch4jPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            
+            Write-Host "Launch4j setup completed successfully"
+        }
+        catch {
+            Write-Host "Error: $_"
+            throw
+        }
 
-    - name: Create EXE
+    - name: Verify Launch4j Installation
+      shell: pwsh
       run: |
-        ./launch4j-3.14/launch4j myapp.xml  # Adjust the path to your config file
+        $launch4jExe = Join-Path -Path $pwd -ChildPath "launch4j\launch4j.exe"
+        if (Test-Path $launch4jExe) {
+            Write-Host "Launch4j executable found at: $launch4jExe"
+        } else {
+            throw "Launch4j executable not found"
+        }
 
-    - name: Upload EXE artifact
-      uses: actions/upload-artifact@v4
+    - name: Create .exe with Launch4j
+      shell: pwsh
+      run: |
+        $launch4jExe = Join-Path -Path $pwd -ChildPath "launch4j\launch4j.exe"
+        $configPath = Join-Path -Path $pwd -ChildPath "launch4j-config.xml"
+        
+        if (-not (Test-Path $configPath)) {
+            throw "Launch4j configuration file not found at: $configPath"
+        }
+        
+        Write-Host "Running Launch4j with config: $configPath"
+        & $launch4jExe $configPath
+
+    - name: Upload .exe as artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: myapp-executable
-        path: path/to/your/exe/myapp.exe  # Adjust the path accordingly
+        name: game-executable
+        path: target/output.exe  # Adjust this path to match your output path
