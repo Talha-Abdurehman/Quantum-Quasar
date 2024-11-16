@@ -29,9 +29,7 @@ jobs:
     - name: Download Launch4j
       run: |
         wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-linux-x64.tgz/download -O launch4j-linux.tgz
-        ls -l  # List contents of current directory after download
         tar -xzf launch4j-linux.tgz
-        ls -l  # List contents of current directory after extraction
 
     - name: Fix Line Endings for Launch4j Script
       run: |
@@ -47,14 +45,14 @@ jobs:
           exit 1
         fi
 
-    - name: List Launch4j Directory After Creation
-      run: ls -l launch4j || echo "Launch4j directory does not exist."
+    - name: List Current Directory After Creation
+      run: ls -l  # This will show where myapp.exe is created
 
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: launch4j/myapp.exe  # Adjusted path
+        path: ./myapp.exe  # Adjust this path based on where myapp.exe is found
 
     - name: Commit and Push EXE to Repository
       env:
@@ -63,6 +61,8 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Talha-Abdurehman/Quantum-Quasar.git
-        git add ./launch4j/myapp.exe 
+        
+        # Adjust this path based on where myapp.exe is found
+        git add ./myapp.exe 
         git commit -m "Add new version of myapp.exe"
         git push || echo "No changes to commit."
