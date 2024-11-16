@@ -1,41 +1,41 @@
-# name: Build and Package Java Application
+name: Build and Package Java Application
 
-# on:
-#   push:
-#     branches:
-#       - main  # Adjust the branch name as needed
-#   workflow_dispatch:  # Allow manual runs
+on:
+  push:
+    branches:
+      - main  # Adjust the branch name as needed
+  workflow_dispatch:  # Allow manual runs
 
-# jobs:
-#   build:
-#     runs-on: windows-latest
+jobs:
+  build:
+    runs-on: windows-latest
 
-#     steps:
-#     - name: Checkout repository
-#       uses: actions/checkout@v3
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-#     - name: Set up Java
-#       uses: actions/setup-java@v3
-#       with:
-#         distribution: 'zulu' # Choose a distribution, e.g., AdoptOpenJDK, Zulu
-#         java-version: '17'   # Use the Java version you're targeting
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu' # Choose a distribution, e.g., AdoptOpenJDK, Zulu
+        java-version: '17'   # Use the Java version you're targeting
 
-#     - name: Build Java application
-#       run: |
-#         # Use your build tool to package the application
-#         mvn clean package # For Maven
-#         # gradlew build  # Uncomment for Gradle
+    - name: Build Java application
+      run: |
+        # Use your build tool to package the application
+        mvn clean package # For Maven
+        # gradlew build  # Uncomment for Gradle
 
-#     - name: Install Launch4j
-#       run: choco install launch4j -y # Chocolatey must be pre-installed
+    - name: Install Launch4j
+      run: choco install launch4j -y # Chocolatey must be pre-installed
 
-#     - name: Create .exe with Launch4j
-#       run: |
-#         # Configure Launch4j and execute
-#         launch4j --config launch4j-config.xml
+    - name: Create .exe with Launch4j
+      run: |
+        # Configure Launch4j and execute
+        launch4j --config launch4j-config.xml
 
-#     - name: Upload .exe as artifact
-#       uses: actions/upload-artifact@v3
-#       with:
-#         name: game-executable
-#         path: path/to/output.exe  # Replace with the actual path to the .exe
+    - name: Upload .exe as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: game-executable
+        path: path/to/output.exe  # Replace with the actual path to the .exe
