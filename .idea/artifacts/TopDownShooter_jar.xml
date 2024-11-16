@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TopDownShooter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TopDownShooter_jar</output-path>
+    <root id="archive" name="TopDownShooter.jar">
+      <element id="module-output" name="TopDownShooter" />
+    </root>
+  </artifact>
+</component>

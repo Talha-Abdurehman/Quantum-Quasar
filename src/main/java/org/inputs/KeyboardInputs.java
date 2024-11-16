@@ -8,7 +8,6 @@ import java.awt.event.KeyListener;
 import java.security.Key;
 
 public class KeyboardInputs implements KeyListener {
-
     private GamePanel gamePanel;
     public KeyboardInputs(GamePanel gamePanel){
         this.gamePanel = gamePanel;
@@ -25,15 +24,19 @@ public class KeyboardInputs implements KeyListener {
 
             case KeyEvent.VK_W:
                 System.out.println("W Pressed");
+                gamePanel.changeYDelta(-5);
                 break;
             case KeyEvent.VK_S:
                 System.out.println("S Pressed");
+                gamePanel.changeYDelta(5);
                 break;
             case KeyEvent.VK_A:
                 System.out.println("A Pressed");
+                gamePanel.changeXDelta(-5);
                 break;
             case KeyEvent.VK_D:
                 System.out.println("D Pressed");
+                gamePanel.changeXDelta(5);
                 break;
             case KeyEvent.VK_SPACE:
                 System.out.println("Space Bar Pressed");
