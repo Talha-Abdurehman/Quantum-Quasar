@@ -1,35 +1,54 @@
-name: Build Java EXE
+name: Build and Package Java Application
 
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Set up JDK
-      uses: actions/setup-java@v2
+    - name: Set up Java
+      uses: actions/setup-java@v3
       with:
-        java-version: '11' # Specify the version of Java you need
+        distribution: 'zulu'
+        java-version: '17'
 
-    - name: Build with Maven
-      run: mvn clean package # Adjust if you're using Gradle or another build tool
+    - name: Verify Chocolatey Installation
+      run: choco --version
 
-    - name: Create EXE
+    - name: Install or Reinstall Launch4j
+      run: choco install launch4j -y --force
+
+    - name: Add Launch4j to PATH
       run: |
-        # Use Launch4j or similar tool to wrap your JAR into an EXE
-        # Example command, adjust according to your setup
-        launch4j myapp.xml
+        $env:Path += ";C:\ProgramData\chocolatey\lib\launch4j\tools"
+        echo $env:Path
 
-    - name: Upload EXE artifact
-      uses: actions/upload-artifact@v2
+    - name: Verify Launch4j Installation
+      run: launch4j --version
+
+    # Fallback: Download Launch4j Portable
+    - name: Download Launch4j Portable
+      if: failure()
+      run: |
+        Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/launch4j/launch4j-3.14-win32.zip" -OutFile "launch4j.zip"
+        Expand-Archive -Path "launch4j.zip" -DestinationPath "launch4j"
+        $env:Path += ";${{ github.workspace }}\launch4j"
+        echo $env:Path
+
+    - name: Create .exe with Launch4j
+      run: |
+        launch4j\launch4j.exe --config launch4j-config.xml
+
+    - name: Upload .exe as artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: myapp-executable
-        path: path/to/your/exe/myapp.exe # Adjust the path accordingly
+        name: game-executable
+        path: path/to/output.exe
