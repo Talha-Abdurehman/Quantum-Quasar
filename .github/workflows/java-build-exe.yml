@@ -26,7 +26,14 @@ jobs:
 
     - name: Download Launch4j Installer
       run: |
-        Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/launch4j/files/launch4j-3/3.50/launch4j-3.50.exe" -OutFile "launch4j-installer.exe"
+        curl -L -o launch4j-installer.exe "https://downloads.sourceforge.net/project/launch4j/files/launch4j-3/3.50/launch4j-3.50.exe"
+
+    - name: Verify Launch4j Installer
+      run: |
+        if (!(Test-Path .\launch4j-installer.exe)) {
+          Write-Error "Launch4j installer download failed."
+          exit 1
+        }
 
     - name: Install Launch4j
       run: |
@@ -36,11 +43,4 @@ jobs:
       run: launch4j --version
 
     - name: Create Executable with Launch4j
-      run: |
-        launch4j --config launch4j-config.xml
-
-    - name: Upload Executable as Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: game-executable
-        path: path/to/output.exe  # Replace with the actual path of your .exe
+      run:
