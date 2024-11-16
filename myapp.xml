@@ -2,7 +2,7 @@
 <launch4jConfig>
     <dontWrapJar>false</dontWrapJar>
     <headerType>gui</headerType>
-    <jar>path/to/your/jarfile.jar</jar> <!-- Adjust this path -->
+   <jar>target/myapp-1.0-SNAPSHOT.jar</jar>
     <outfile>your-output.exe</outfile>
     <errTitle>Your Application Error</errTitle>
     <cmdLine></cmdLine>
