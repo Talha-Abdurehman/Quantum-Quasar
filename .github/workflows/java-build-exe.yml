@@ -24,12 +24,13 @@ jobs:
       run: |
         mvn clean package # Adjust to your build tool (e.g., Maven or Gradle)
 
-    - name: Download and Extract Launch4j
+    - name: Download Launch4j Installer
       run: |
-        Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip" -OutFile "launch4j.zip"
-        Expand-Archive -Path "launch4j.zip" -DestinationPath "launch4j"
-        $env:Path += ";${{ github.workspace }}\launch4j"
-        echo "Launch4j added to PATH"
+        Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/launch4j/files/launch4j-3/3.50/launch4j-3.50.exe" -OutFile "launch4j-installer.exe"
+
+    - name: Install Launch4j
+      run: |
+        Start-Process -FilePath ".\launch4j-installer.exe" -ArgumentList "/VERYSILENT" -NoNewWindow -Wait
 
     - name: Verify Launch4j Installation
       run: launch4j --version
