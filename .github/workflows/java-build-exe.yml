@@ -1,44 +1,35 @@
-name: Build and Package Java Application
+name: Build Java EXE
 
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Set up Java
-      uses: actions/setup-java@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v2
       with:
-        distribution: 'zulu'
-        java-version: '17'
+        java-version: '11' # Specify the version of Java you need
 
-    - name: Verify Chocolatey Installation
-      run: choco --version
+    - name: Build with Maven
+      run: mvn clean package # Adjust if you're using Gradle or another build tool
 
-    - name: Install Launch4j
-      run: choco install launch4j -y
-
-    - name: Add Launch4j to PATH
+    - name: Create EXE
       run: |
-        $env:Path += ";C:\ProgramData\chocolatey\bin"
+        # Use Launch4j or similar tool to wrap your JAR into an EXE
+        # Example command, adjust according to your setup
+        launch4j myapp.xml
 
-    - name: Verify Launch4j Installation
-      run: launch4j --version
-
-    - name: Create .exe with Launch4j
-      run: |
-        launch4j --config launch4j-config.xml
-
-    - name: Upload .exe as artifact
-      uses: actions/upload-artifact@v3
+    - name: Upload EXE artifact
+      uses: actions/upload-artifact@v2
       with:
-        name: game-executable
-        path: path/to/output.exe
+        name: myapp-executable
+        path: path/to/your/exe/myapp.exe # Adjust the path accordingly
