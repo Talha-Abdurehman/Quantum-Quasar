@@ -49,4 +49,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: ./launch4j/myapp.exe  # Update this path based on previous checks or keep it as ./launch4j/your-output.exe if not changing output name.
+        path: /home/runner/work/Quantum-Quasar/Quantum-Quasar/myapp.exe  # Update this path based on previous checks or keep it as ./launch4j/your-output.exe if not changing output name.
