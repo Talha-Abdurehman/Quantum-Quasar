@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # Change to Windows runner
 
     steps:
     - name: Checkout code
@@ -24,35 +24,34 @@ jobs:
       run: mvn clean package
 
     - name: List Target Directory
-      run: ls -l target
+      run: dir target  # Use 'dir' instead of 'ls' for Windows
 
     - name: Download Launch4j
       run: |
-        wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-linux-x64.tgz/download -O launch4j-linux.tgz
-        tar -xzf launch4j-linux.tgz
+        Invoke-WebRequest -Uri "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-windows.zip/download" -OutFile "launch4j-windows.zip"
+        Expand-Archive -Path "launch4j-windows.zip" -DestinationPath "launch4j"
 
     - name: Fix Line Endings for Launch4j Script
       run: |
-        sed -i 's/\r$//' launch4j/launch4j
+        (Get-Content launch4j\launch4j.ps1) | Set-Content launch4j\launch4j.ps1  # Ensure correct line endings if needed
 
     - name: Create EXE
       run: |
-        if [ -f "myapp.xml" ]; then
-          chmod +x launch4j/launch4j
-          ./launch4j/launch4j myapp.xml || { echo "Launch4j failed"; exit 1; }
-        else
-          echo "myapp.xml does not exist."
+        if (Test-Path "myapp.xml") {
+          & launch4j\launch4j myapp.xml  # Use '&' to call the script in PowerShell
+        } else {
+          Write-Host "myapp.xml does not exist."
           exit 1
-        fi
+        }
 
     - name: List Current Directory After Creation
-      run: ls -l  # This will show where myapp.exe is created
+      run: dir  # List current directory to check for myapp.exe
 
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: ./myapp.exe  # Adjust this path based on where myapp.exe is found
+        path: .\myapp.exe  # Adjust this path based on where myapp.exe is found
 
     - name: Commit and Push EXE to Repository
       env:
@@ -62,7 +61,6 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Talha-Abdurehman/Quantum-Quasar.git
         
-        # Adjust this path based on where myapp.exe is found
-        git add ./myapp.exe 
+        git add .\myapp.exe  # Adjust this path based on where myapp.exe is found
         git commit -m "Add new version of myapp.exe"
         git push || echo "No changes to commit."
