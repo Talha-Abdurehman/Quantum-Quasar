@@ -1,12 +1,10 @@
 package org.example;
 
 public class Game {
-    private GameWindow gamewindow;
-    private GamePanel gamepanel;
 
     public Game(){
-        gamepanel = new GamePanel();
-        gamewindow = new GameWindow(gamepanel);
+        GamePanel gamepanel = new GamePanel();
+        GameWindow gamewindow = new GameWindow(gamepanel);
         gamepanel.requestFocus();
     }
 }
