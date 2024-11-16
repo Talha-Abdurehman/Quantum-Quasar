@@ -53,11 +53,11 @@ jobs:
 
     - name: Commit and Push EXE to Repository
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Talha-Abdurehman/Quantum-Quasar.git
+        git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Talha-Abdurehman/Quantum-Quasar.git
         git add myapp.exe
         git commit -m "Add new version of myapp.exe"
         git push
