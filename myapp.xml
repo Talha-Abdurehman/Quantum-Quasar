@@ -7,10 +7,18 @@
     <errTitle>Your Application Error</errTitle>
     <cmdLine></cmdLine>
     <chdir>.</chdir>
-
+    <priority>normal</priority>
+      <downloadUrl></downloadUrl>
+      <supportUrl></supportUrl>
+      <stayAlive>false</stayAlive>
+      <restartOnCrash>false</restartOnCrash>
+      <manifest></manifest>
+      <icon></icon>
     <jre>
         <path>%JAVA_HOME%</path> <!-- Use JAVA_HOME as needed -->
-        <minVersion>11</minVersion>
+        <requiresJdk>false</requiresJdk>
+        <requires64Bit>false</requires64Bit>
+        <minVersion></minVersion>
         <maxVersion></maxVersion>
     </jre>
 </launch4jConfig>
