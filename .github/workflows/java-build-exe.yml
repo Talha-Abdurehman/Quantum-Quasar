@@ -28,7 +28,7 @@ jobs:
 
     - name: Download Launch4j
       run: |
-        wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux-x64.tgz/download -O launch4j-linux.tgz
+        wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-linux-x64.tgz/download -O launch4j-linux.tgz
         tar -xzf launch4j-linux.tgz
         ls -l  # List contents of current directory for debugging
 
