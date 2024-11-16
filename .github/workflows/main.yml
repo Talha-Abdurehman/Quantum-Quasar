@@ -45,7 +45,7 @@ jobs:
     - name: Move EXE to Out Folder
       run: |
         mkdir -p out
-        mv ./launch4j/myapp.exe out/
+        mv your-output.exe out/
 
     - name: List Out Directory
       run: ls -l out  # Verify that the .exe file is in the out directory
@@ -54,4 +54,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: out/myapp.exe
+        path: out/your-output.exe
