@@ -1,13 +1,15 @@
 name: Build and Package Java Application
+
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # Run on pushes to the main branch
+  workflow_dispatch:  # Allow manual triggering of the workflow
 
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -16,105 +18,28 @@ jobs:
       uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
-        java-version: '17'
+        java-version: '17'  # Set the Java version as per your project
 
-    - name: Download and Setup Launch4j
-      shell: pwsh
+    - name: Build Java Application
       run: |
-        Write-Host "Creating temporary directory..."
-        New-Item -ItemType Directory -Force -Path ".\temp" | Out-Null
-        
-        Write-Host "Downloading Launch4j..."
-        $url = "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-win32.exe/download"
-        $outputPath = ".\temp\launch4j-installer.exe"
-        
-        try {
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            
-            # Using curl.exe for download (more reliable than Invoke-WebRequest)
-            Write-Host "Starting download using curl..."
-            curl.exe -L -o $outputPath $url
-            
-            if (!(Test-Path $outputPath)) {
-                throw "Download failed - file not found"
-            }
-            
-            $fileInfo = Get-Item $outputPath
-            Write-Host "Download completed. File size: $($fileInfo.Length) bytes"
-            
-            # Create launch4j directory
-            New-Item -ItemType Directory -Force -Path "launch4j" | Out-Null
-            
-            # Extract the self-extracting exe
-            Write-Host "Extracting Launch4j..."
-            Start-Process -FilePath $outputPath -ArgumentList "/SILENT", "/DIR=`"$PWD\launch4j`"" -Wait
-            
-            # Verify installation
-            if (!(Test-Path ".\launch4j\launch4j.exe")) {
-                throw "Installation failed - launch4j.exe not found"
-            }
-            
-            Write-Host "Launch4j installed successfully"
-            
-            # Add to PATH
-            $launch4jPath = "$PWD\launch4j"
-            echo $launch4jPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            Write-Host "Added to PATH: $launch4jPath"
-            
-        } catch {
-            Write-Host "Error occurred: $_"
-            Write-Host "Stack trace: $($_.ScriptStackTrace)"
-            throw
-        }
+        mvn clean package # Adjust to your build tool (e.g., Maven or Gradle)
+
+    - name: Download and Extract Launch4j
+      run: |
+        Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip" -OutFile "launch4j.zip"
+        Expand-Archive -Path "launch4j.zip" -DestinationPath "launch4j"
+        $env:Path += ";${{ github.workspace }}\launch4j"
+        echo "Launch4j added to PATH"
 
     - name: Verify Launch4j Installation
-      shell: pwsh
-      run: |
-        $launch4jExe = Join-Path $PWD "launch4j\launch4j.exe"
-        if (Test-Path $launch4jExe) {
-            Write-Host "Launch4j found at: $launch4jExe"
-            Write-Host "File details:"
-            Get-Item $launch4jExe | Format-List *
-        } else {
-            throw "Launch4j executable not found at: $launch4jExe"
-        }
+      run: launch4j --version
 
-    # Alternative direct ZIP download method
-    - name: Alternative Download Method (if needed)
-      if: failure()
-      shell: pwsh
+    - name: Create Executable with Launch4j
       run: |
-        Write-Host "Attempting alternative download method..."
-        $url = "https://master.dl.sourceforge.net/project/launch4j/launch4j-3/3.14/launch4j-3.14-win32.zip"
-        $outputFile = "launch4j.zip"
-        
-        # Download using BitsTransfer
-        Start-BitsTransfer -Source $url -Destination $outputFile
-        
-        if (Test-Path $outputFile) {
-            Expand-Archive -Path $outputFile -DestinationPath "launch4j" -Force
-        } else {
-            throw "Alternative download failed"
-        }
+        launch4j --config launch4j-config.xml
 
-    - name: Create .exe with Launch4j
-      shell: pwsh
-      run: |
-        $launch4jExe = Join-Path $PWD "launch4j\launch4j.exe"
-        $configPath = Join-Path $PWD "launch4j-config.xml"
-        
-        if (!(Test-Path $configPath)) {
-            throw "Configuration file not found at: $configPath"
-        }
-        
-        Write-Host "Running Launch4j..."
-        & $launch4jExe $configPath
-        if ($LASTEXITCODE -ne 0) {
-            throw "Launch4j failed with exit code: $LASTEXITCODE"
-        }
-
-    - name: Upload .exe as artifact
+    - name: Upload Executable as Artifact
       uses: actions/upload-artifact@v3
       with:
         name: game-executable
-        path: target/output.exe  # Adjust this path to match your actual output path
+        path: path/to/output.exe  # Replace with the actual path of your .exe
