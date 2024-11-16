@@ -47,4 +47,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: path/to/your/exe/myapp.exe  # Adjust the path accordingly
+        path: ./launch4j/myapp.exe  # Adjust the path accordingly
