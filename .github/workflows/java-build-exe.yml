@@ -1,40 +1,40 @@
-name: Build Java EXE
-
+name: Build and Package Java Application
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Set up JDK
+    - name: Set up Java
       uses: actions/setup-java@v3
       with:
+        distribution: 'zulu'
         java-version: '17'
-        distribution: 'temurin'
-
-    - name: Build with Maven
-      run: mvn clean package
 
     - name: Download Launch4j
       run: |
-        wget https://github.com/lukeshu/launch4j/releases/download/3.14/launch4j-3.14-linux.tar.gz
-        tar -xzf launch4j-3.14-linux.tar.gz
-        chmod +x launch4j-3.14/launch4j
+        Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/launch4j/launch4j-3.14-win32.zip" -OutFile "launch4j.zip"
+        Expand-Archive -Path "launch4j.zip" -DestinationPath "launch4j"
+        echo "${{ github.workspace }}\launch4j" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-    - name: Create EXE
+    - name: Build with Maven (if using Maven)
+      run: mvn clean package
+      # Remove this step if you're not using Maven
+
+    - name: Create .exe with Launch4j
       run: |
-        ./launch4j-3.14/launch4j myapp.xml  # Adjust the path to your config file
+        $launch4jPath = "${{ github.workspace }}\launch4j\launch4j.exe"
+        & $launch4jPath "${{ github.workspace }}\launch4j-config.xml"
 
-    - name: Upload EXE artifact
-      uses: actions/upload-artifact@v4
+    - name: Upload .exe as artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: myapp-executable
-        path: path/to/your/exe/myapp.exe  # Adjust the path accordingly
+        name: game-executable
+        path: ${{ github.workspace }}\target\output.exe  # Adjust this path to match your actual output path
