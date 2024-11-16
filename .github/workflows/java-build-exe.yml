@@ -32,15 +32,7 @@ jobs:
           echo "myapp.xml does not exist."
           exit 1
         fi
-
-    - name: Upload Release Asset
-      uses: softprops/action-gh-release@v1
-      with:
-        tag: ${{ github.ref }}
-        files: /home/runner/work/Quantum-Quasar/Quantum-Quasar/myapp.exe  # Path to your generated EXE file
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+        
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
       with:
