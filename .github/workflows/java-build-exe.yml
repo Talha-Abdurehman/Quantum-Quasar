@@ -1,46 +1,67 @@
 name: Build and Package Java Application
-
 on:
   push:
     branches:
-      - main  # Run on pushes to the main branch
-  workflow_dispatch:  # Allow manual triggering of the workflow
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
+      
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
-        java-version: '17'  # Set the Java version as per your project
-
+        java-version: '17'
+        
     - name: Build Java Application
       run: |
-        mvn clean package # Adjust to your build tool (e.g., Maven or Gradle)
-
-    - name: Download Launch4j Installer
+        mvn clean package  # Adjust if you're using a different build tool
+        
+    - name: Download and Setup Launch4j
+      shell: pwsh
       run: |
-        curl -L -o launch4j-installer.exe "https://downloads.sourceforge.net/project/launch4j/files/launch4j-3/3.50/launch4j-3.50.exe"
-
-    - name: Verify Launch4j Installer
-      run: |
-        if (!(Test-Path .\launch4j-installer.exe)) {
-          Write-Error "Launch4j installer download failed."
-          exit 1
+        $url = "https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.50/launch4j-3.50-win32.zip"
+        $outputFile = "launch4j.zip"
+        
+        Write-Host "Downloading Launch4j..."
+        Invoke-WebRequest -Uri $url -OutFile $outputFile -UseBasicParsing
+        
+        Write-Host "Extracting Launch4j..."
+        Expand-Archive -Path $outputFile -DestinationPath "launch4j" -Force
+        
+        # Verify the extraction
+        if (Test-Path ".\launch4j\launch4j.exe") {
+            Write-Host "Launch4j extracted successfully"
+        } else {
+            throw "Launch4j extraction failed - executable not found"
         }
-
-    - name: Install Launch4j
+        
+        # Add Launch4j to Path
+        $launch4jPath = "$PWD\launch4j"
+        echo $launch4jPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        
+    - name: Create Executable
+      shell: pwsh
       run: |
-        Start-Process -FilePath ".\launch4j-installer.exe" -ArgumentList "/VERYSILENT" -NoNewWindow -Wait
-
-    - name: Verify Launch4j Installation
-      run: launch4j --version
-
-    - name: Create Executable with Launch4j
-      run:
+        $launch4jExe = ".\launch4j\launch4j.exe"
+        $configPath = ".\launch4j-config.xml"
+        
+        # Run Launch4j
+        Write-Host "Running Launch4j..."
+        & $launch4jExe $configPath
+        
+        # Check if exe was created
+        if (!(Test-Path ".\target\output.exe")) {
+            throw "EXE creation failed"
+        }
+        
+    - name: Upload Executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: game-executable
+        path: target/output.exe
