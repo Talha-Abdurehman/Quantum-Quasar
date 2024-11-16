@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest  # Change to Windows runner
+    runs-on: windows-latest  # Use Windows runner
 
     steps:
     - name: Checkout code
@@ -24,11 +24,11 @@ jobs:
       run: mvn clean package
 
     - name: List Target Directory
-      run: dir target  # Use 'dir' instead of 'ls' for Windows
+      run: dir target  # Use 'dir' for Windows
 
     - name: Download Launch4j
       run: |
-        Invoke-WebRequest -Uri "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download" -OutFile "launch4j-windows.zip"
+        curl -L -o launch4j-windows.zip "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download"
         Expand-Archive -Path "launch4j-windows.zip" -DestinationPath "launch4j"
 
     - name: Fix Line Endings for Launch4j Script
