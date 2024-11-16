@@ -34,14 +34,17 @@ jobs:
     - name: List Launch4j Directory
       run: dir launch4j  # List contents of launch4j directory to verify installation
 
-    # - name: Fix Line Endings for Launch4j Script
-    #   run: |
-    #     (Get-Content launch4j\launch4j.ps1) | Set-Content launch4j\launch4j.ps1  # Ensure correct line endings if needed
+    - name: List Inner Launch4j Directory
+      run: dir launch4j\launch4j  # List contents of the inner launch4j directory
+
+    - name: Fix Line Endings for Launch4j Script
+      run: |
+        (Get-Content launch4j\launch4j.ps1) | Set-Content launch4j\launch4j.ps1  # Ensure correct line endings if needed
 
     - name: Create EXE
       run: |
         if (Test-Path "myapp.xml") {
-          & ".\launch4j\launch4j.exe" "myapp.xml"  # Use the correct path to the executable
+          & ".\launch4j\launch4j\launch4j.exe" "myapp.xml"  # Adjusted path to point to the correct executable
         } else {
           Write-Host "myapp.xml does not exist."
           exit 1
