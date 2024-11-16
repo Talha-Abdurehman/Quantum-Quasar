@@ -27,12 +27,18 @@ jobs:
       run: |
         wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux-x64.tgz/download -O launch4j-linux.tgz
         tar -xzf launch4j-linux.tgz
-        ls -l launch4j-3.14  # List contents of the extracted directory for debugging
-        chmod +x launch4j-3.14/launch4j
+        ls -l  # List contents of current directory for debugging
+        ls -l launch4j-3.14  # Check if the expected directory exists
 
     - name: Create EXE
       run: |
-        ./launch4j-3.14/launch4j myapp.xml  # Adjust the path to your config file
+        if [ -d "launch4j-3.14" ]; then
+          chmod +x launch4j-3.14/launch4j
+          ./launch4j-3.14/launch4j myapp.xml  # Adjust the path to your config file
+        else
+          echo "Launch4j directory does not exist."
+          exit 1
+        fi
 
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
