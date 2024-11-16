@@ -23,6 +23,9 @@ jobs:
     - name: Build with Maven
       run: mvn clean package
 
+    - name: List Target Directory
+      run: ls -l target  # Check for generated JAR files
+
     - name: Download Launch4j
       run: |
         wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux-x64.tgz/download -O launch4j-linux.tgz
@@ -32,7 +35,7 @@ jobs:
 
     - name: Create EXE
       run: |
-        if [ -f "myapp.xml" ]; then  # Adjust path if necessary
+        if [ -f "myapp.xml" ]; then
           chmod +x launch4j/launch4j
           ./launch4j/launch4j myapp.xml  # Adjust path to your config file
         else
