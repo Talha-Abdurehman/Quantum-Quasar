@@ -25,18 +25,17 @@ jobs:
 
     - name: List Target Directory
       run: ls -l target
-      
-    - name: List Launch4j Directory After Creation
-      run: ls -l launch4j
-  
+
     - name: Download Launch4j
       run: |
         wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-linux-x64.tgz/download -O launch4j-linux.tgz
+        ls -l  # List contents of current directory after download
         tar -xzf launch4j-linux.tgz
+        ls -l  # List contents of current directory after extraction
 
     - name: Fix Line Endings for Launch4j Script
       run: |
-        sed -i 's/\r$//' launch4j/launch4j  # Convert CRLF to LF
+        sed -i 's/\r$//' launch4j/launch4j
 
     - name: Create EXE
       run: |
@@ -48,14 +47,14 @@ jobs:
           exit 1
         fi
 
-    - name: List Launch4j Directory
-      run: ls -l launch4j
+    - name: List Launch4j Directory After Creation
+      run: ls -l launch4j || echo "Launch4j directory does not exist."
 
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: ./launch4j/myapp.exe
+        path: launch4j/myapp.exe  # Adjusted path
 
     - name: Commit and Push EXE to Repository
       env:
