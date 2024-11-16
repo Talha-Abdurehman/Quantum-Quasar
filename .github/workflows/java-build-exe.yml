@@ -47,18 +47,18 @@ jobs:
         name: myapp-executable
         path: /home/runner/work/Quantum-Quasar/Quantum-Quasar/myapp.exe  # Ensure this path is correct based on previous checks
 
-  # download:
-  #   runs-on: ubuntu-latest
-  #   needs: build  # Ensure this job runs after the build job
+  download:
+    runs-on: ubuntu-latest
+    needs: build  # Ensure this job runs after the build job
 
-  #   steps:
-  #   - name: Download EXE artifact
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #       name: myapp-executable
+    steps:
+    - name: Download EXE artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: myapp-executable
 
-  #   - name: List downloaded files
-  #     run: ls -l  # Check what files were downloaded
+    - name: List downloaded files
+      run: ls -l  # Check what files were downloaded
 
 
 
