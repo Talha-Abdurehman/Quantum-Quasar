@@ -28,13 +28,13 @@ jobs:
         wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux-x64.tgz/download -O launch4j-linux.tgz
         tar -xzf launch4j-linux.tgz
         ls -l  # List contents of current directory for debugging
-        ls -l launch4j-3.14  # Check if the expected directory exists
+        ls -l launch4j  # Check if the expected directory exists
 
     - name: Create EXE
       run: |
-        if [ -d "launch4j-3.14" ]; then
-          chmod +x launch4j-3.14/launch4j
-          ./launch4j-3.14/launch4j myapp.xml  # Adjust the path to your config file
+        if [ -d "launch4j" ]; then
+          chmod +x launch4j/launch4j
+          ./launch4j/launch4j myapp.xml  # Adjust the path to your config file
         else
           echo "Launch4j directory does not exist."
           exit 1
