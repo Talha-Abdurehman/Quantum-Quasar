@@ -28,7 +28,7 @@ jobs:
 
     - name: Download Launch4j
       run: |
-        Invoke-WebRequest -Uri "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-windows.zip" -OutFile "launch4j-windows.zip"
+        Invoke-WebRequest -Uri "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip" -OutFile "launch4j-windows.zip"
         Expand-Archive -Path "launch4j-windows.zip" -DestinationPath "launch4j"
 
     - name: Fix Line Endings for Launch4j Script
