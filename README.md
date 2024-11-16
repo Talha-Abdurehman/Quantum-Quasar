@@ -40,4 +40,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Special thanks to the Java community for their support and resources.
 
 ## Contact
-For any questions or suggestions, feel free to reach out to talhakyle124@gmail.com.
+For any questions or suggestions, feel free to reach out to talhakyle124@gmail.com (or) assabtigle@gmail.com.
