@@ -46,7 +46,7 @@ jobs:
         Get-Location  # Print current working directory
         
         if (Test-Path "myapp.xml") {
-          & ".\launch4j\launch4j\launch4j.exe" ".\myapp.xml"  # Adjusted path to point to myapp.xml in the root directory
+          & ".\launch4j\launch4j\launch4j.exe" "D:\a\Quantum-Quasar\Quantum-Quasar\myapp.xml"  # Use full path to myapp.xml
         } else {
           Write-Host "myapp.xml does not exist."
           exit 1
