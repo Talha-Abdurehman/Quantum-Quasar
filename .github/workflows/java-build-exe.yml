@@ -57,7 +57,7 @@ jobs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        cp /home/runner/work/Quantum-Quasar/Quantum-Quasar/myapp.exe .
+        cp ./myapp.exe .
         git add myapp.exe
         git commit -m "Add new version of myapp.exe"
         git push
