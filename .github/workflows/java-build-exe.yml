@@ -15,21 +15,21 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3  # Updated to v3
       with:
-        java-version: '11' # Specify the version of Java you need
+        java-version: '11'            # Specify the version of Java you need
+        distribution: 'temurin'       # Use 'temurin' instead of 'adopt'
 
     - name: Build with Maven
-      run: mvn clean package # Adjust if you're using Gradle or another build tool
+      run: mvn clean package          # Adjust if you're using Gradle or another build tool
 
     - name: Create EXE
       run: |
         # Use Launch4j or similar tool to wrap your JAR into an EXE
-        # Example command, adjust according to your setup
         launch4j myapp.xml
 
     - name: Upload EXE artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4  # Updated to v4
       with:
         name: myapp-executable
-        path: path/to/your/exe/myapp.exe # Adjust the path accordingly
+        path: path/to/your/exe/myapp.exe  # Adjust the path accordingly
