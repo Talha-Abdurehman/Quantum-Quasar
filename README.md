@@ -13,7 +13,7 @@ Welcome to the Top-Down Space Shooter Game! This is a simple 2D space shooter ga
 ## Getting Started
 
 ### Prerequisites
-- Java Development Kit (JDK) 8 or later
+- Java Development Kit (JDK) 17 or later
 - An Integrated Development Environment (IDE) like IntelliJ IDEA, Eclipse, or NetBeans
 
 ### Installation
