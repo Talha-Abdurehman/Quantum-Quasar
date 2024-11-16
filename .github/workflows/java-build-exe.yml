@@ -3,8 +3,8 @@ name: Build and Package Java Application
 on:
   push:
     branches:
-      - main  # Adjust the branch name as needed
-  workflow_dispatch:  # Allow manual runs
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,25 +17,28 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
-        distribution: 'zulu' # Choose a distribution, e.g., AdoptOpenJDK, Zulu
-        java-version: '17'   # Use the Java version you're targeting
+        distribution: 'zulu'
+        java-version: '17'
 
-    - name: Build Java application
-      run: |
-        # Use your build tool to package the application
-        mvn clean package # For Maven
-        # gradlew build  # Uncomment for Gradle
+    - name: Verify Chocolatey Installation
+      run: choco --version
 
     - name: Install Launch4j
-      run: choco install launch4j -y # Chocolatey must be pre-installed
+      run: choco install launch4j -y
+
+    - name: Add Launch4j to PATH
+      run: |
+        $env:Path += ";C:\ProgramData\chocolatey\bin"
+
+    - name: Verify Launch4j Installation
+      run: launch4j --version
 
     - name: Create .exe with Launch4j
       run: |
-        # Configure Launch4j and execute
         launch4j --config launch4j-config.xml
 
     - name: Upload .exe as artifact
       uses: actions/upload-artifact@v3
       with:
         name: game-executable
-        path: path/to/output.exe  # Replace with the actual path to the .exe
+        path: path/to/output.exe
