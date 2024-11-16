@@ -31,6 +31,9 @@ jobs:
         curl -L -o launch4j-windows.zip "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download"
         Expand-Archive -Path "launch4j-windows.zip" -DestinationPath "launch4j"
 
+    - name: List Launch4j Directory
+      run: dir launch4j  # List contents of launch4j directory to verify installation
+
     # - name: Fix Line Endings for Launch4j Script
     #   run: |
     #     (Get-Content launch4j\launch4j.ps1) | Set-Content launch4j\launch4j.ps1  # Ensure correct line endings if needed
@@ -38,7 +41,7 @@ jobs:
     - name: Create EXE
       run: |
         if (Test-Path "myapp.xml") {
-          & launch4j\launch4j myapp.xml  # Use '&' to call the script in PowerShell
+          & ".\launch4j\launch4j.exe" "myapp.xml"  # Use the correct path to the executable
         } else {
           Write-Host "myapp.xml does not exist."
           exit 1
