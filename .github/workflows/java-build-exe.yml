@@ -25,7 +25,7 @@ jobs:
 
     - name: Download Launch4j
       run: |
-        wget https://github.com/leibnitz27/launch4j/releases/download/v3.14/launch4j-3.14-linux.tar.gz
+        wget https://github.com/lukeshu/launch4j/releases/download/3.14/launch4j-3.14-linux.tar.gz
         tar -xzf launch4j-3.14-linux.tar.gz
         chmod +x launch4j-3.14/launch4j
 
