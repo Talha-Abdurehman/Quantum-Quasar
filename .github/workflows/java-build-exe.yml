@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3  # Update to v3
+      uses: actions/checkout@v3  # Using updated version
 
     - name: Set up JDK
       uses: actions/setup-java@v3  # Already using v3
@@ -49,4 +49,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: ./launch4j/myapp.exe  # Ensure this path is correct based on previous checks
+        path: ./launch4j/myapp.exe  # Update this path based on previous checks or keep it as ./launch4j/your-output.exe if not changing output name.
