@@ -37,10 +37,6 @@ jobs:
     - name: List Inner Launch4j Directory
       run: dir launch4j\launch4j  # List contents of the inner launch4j directory
 
-    - name: Fix Line Endings for Launch4j Script
-      run: |
-        (Get-Content launch4j\launch4j.ps1) | Set-Content launch4j\launch4j.ps1  # Ensure correct line endings if needed
-
     - name: Create EXE
       run: |
         if (Test-Path "myapp.xml") {
