@@ -1,130 +1,47 @@
-name: Build and Package Java Application
+name: Build Java EXE
+
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    runs-on: ubuntu-latest
 
-    - name: Set up Java
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
       uses: actions/setup-java@v3
       with:
-        distribution: 'zulu'
         java-version: '17'
+        distribution: 'temurin'
 
-    - name: Download and Setup Launch4j
-      shell: pwsh
+    - name: Build with Maven
+      run: mvn clean package
+
+    - name: Download Launch4j
       run: |
-        # Define variables
-        $launch4jVersion = "3.14"
-        $fileName = "launch4j-${launch4jVersion}-win32.zip"
-        $downloadUrl = "https://github.com/TheBoegl/maven-download-plugin/raw/master/launch4j-${launch4jVersion}-win32.zip"
-        
-        Write-Host "Downloading Launch4j version $launch4jVersion..."
-        
-        try {
-            # Configure TLS
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            
-            # Create WebClient for download
-            $webClient = New-Object System.Net.WebClient
-            
-            # Download with progress
-            Write-Host "Starting download from $downloadUrl"
-            $webClient.DownloadFile($downloadUrl, "$PWD\$fileName")
-            
-            # Verify file exists and has content
-            if (!(Test-Path "$PWD\$fileName")) {
-                throw "Download failed - file not found"
-            }
-            
-            $fileInfo = Get-Item "$PWD\$fileName"
-            if ($fileInfo.Length -eq 0) {
-                throw "Downloaded file is empty"
-            }
-            
-            Write-Host "Download completed. File size: $($fileInfo.Length) bytes"
-            
-            # Create directory
-            New-Item -ItemType Directory -Force -Path "launch4j"
-            
-            Write-Host "Extracting ZIP file..."
-            Add-Type -AssemblyName System.IO.Compression.FileSystem
-            [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\$fileName", "$PWD\launch4j")
-            
-            # Verify extraction
-            if (!(Test-Path "$PWD\launch4j\launch4j.exe")) {
-                throw "Extraction failed - launch4j.exe not found"
-            }
-            
-            Write-Host "Launch4j extracted successfully"
-            
-            # Add to PATH
-            $launch4jPath = "$PWD\launch4j"
-            echo $launch4jPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            Write-Host "Added to PATH: $launch4jPath"
-            
-        } catch {
-            Write-Host "Error occurred: $_"
-            Write-Host "Stack trace: $($_.ScriptStackTrace)"
-            throw
-        } finally {
-            if ($webClient) {
-                $webClient.Dispose()
-            }
-        }
+        wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux-x64.tgz/download -O launch4j-linux.tgz
+        tar -xzf launch4j-linux.tgz
+        ls -l  # List contents of current directory for debugging
+        ls -l launch4j  # Check if the expected directory exists
 
-    - name: Verify Launch4j Installation
-      shell: pwsh
+    - name: Create EXE
       run: |
-        $launch4jExe = Join-Path $PWD "launch4j\launch4j.exe"
-        if (Test-Path $launch4jExe) {
-            Write-Host "Launch4j found at: $launch4jExe"
-            Write-Host "File details:"
-            Get-Item $launch4jExe | Format-List *
-        } else {
-            throw "Launch4j executable not found at: $launch4jExe"
-        }
+        if [ -f "config/myapp.xml" ]; then  # Adjust path if necessary
+          chmod +x launch4j/launch4j
+          ./launch4j/launch4j config/myapp.xml  # Adjust path to your config file
+        else
+          echo "myapp.xml does not exist."
+          exit 1
+        fi
 
-    # Alternative backup method using 7zip if needed
-    - name: Install 7Zip PowerShell Module (Backup Method)
-      if: failure()
-      shell: pwsh
-      run: |
-        Install-Module -Name 7Zip4PowerShell -Force -Scope CurrentUser
-        Write-Host "7Zip module installed"
-
-    - name: Extract using 7Zip (Backup Method)
-      if: failure()
-      shell: pwsh
-      run: |
-        Import-Module 7Zip4PowerShell
-        Expand-7Zip -ArchiveFileName "launch4j-3.14-win32.zip" -TargetPath "launch4j"
-
-    - name: Create .exe with Launch4j
-      shell: pwsh
-      run: |
-        $launch4jExe = Join-Path $PWD "launch4j\launch4j.exe"
-        $configPath = Join-Path $PWD "launch4j-config.xml"
-        
-        if (!(Test-Path $configPath)) {
-            throw "Configuration file not found at: $configPath"
-        }
-        
-        Write-Host "Running Launch4j..."
-        & $launch4jExe $configPath
-        if ($LASTEXITCODE -ne 0) {
-            throw "Launch4j failed with exit code: $LASTEXITCODE"
-        }
-
-    - name: Upload .exe as artifact
-      uses: actions/upload-artifact@v3
+    - name: Upload EXE artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: game-executable
-        path: target/output.exe  # Adjust this path to match your actual output path
+        name: myapp-executable
+        path: path/to/your/exe/myapp.exe  # Adjust the path accordingly
