@@ -26,6 +26,9 @@ jobs:
     - name: List Target Directory
       run: dir target  # Use 'dir' for Windows
 
+    - name: List Root Directory
+      run: dir  # List all files in the root directory to check for myapp.xml
+
     - name: Download Launch4j
       run: |
         curl -L -o launch4j-windows.zip "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download"
@@ -39,6 +42,9 @@ jobs:
 
     - name: Create EXE
       run: |
+        Write-Host "Current Directory:"
+        Get-Location  # Print current working directory
+        
         if (Test-Path "myapp.xml") {
           & ".\launch4j\launch4j\launch4j.exe" ".\myapp.xml"  # Adjusted path to point to myapp.xml in the root directory
         } else {
