@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3  # Using updated version
+      uses: actions/checkout@v3
 
     - name: Set up JDK
-      uses: actions/setup-java@v3  # Already using v3
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -24,32 +24,35 @@ jobs:
       run: mvn clean package
 
     - name: List Target Directory
-      run: ls -l target  # Check for generated JAR files
+      run: ls -l target
 
     - name: Download Launch4j
       run: |
         wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-linux-x64.tgz/download -O launch4j-linux.tgz
         tar -xzf launch4j-linux.tgz
-        ls -l  # List contents of current directory for debugging
+
+    - name: Fix Line Endings for Launch4j Script
+      run: |
+        sed -i 's/\r$//' launch4j/launch4j  # Convert CRLF to LF
 
     - name: Create EXE
       run: |
         if [ -f "myapp.xml" ]; then
           chmod +x launch4j/launch4j
-          ./launch4j/launch4j myapp.xml  # Adjust path to your config file
+          ./launch4j/launch4j myapp.xml || { echo "Launch4j failed"; exit 1; }
         else
           echo "myapp.xml does not exist."
           exit 1
         fi
 
     - name: List Launch4j Directory
-      run: ls -l launch4j  # Check if myapp.exe was created
+      run: ls -l launch4j
 
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: /home/runner/work/Quantum-Quasar/Quantum-Quasar/myapp.exe  # Update this path based on previous checks or keep it as ./launch4j/your-output.exe if not changing output name.
+        path: ./launch4j/myapp.exe
 
     - name: Commit and Push EXE to Repository
       env:
@@ -58,6 +61,6 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Talha-Abdurehman/Quantum-Quasar.git
-        git add myapp.exe
+        git add ./launch4j/myapp.exe 
         git commit -m "Add new version of myapp.exe"
-        git push
+        git push || echo "No changes to commit."
