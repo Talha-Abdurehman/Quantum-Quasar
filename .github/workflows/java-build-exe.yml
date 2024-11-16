@@ -1,46 +1,35 @@
-name: Build and Package Java Application
+name: Build Java EXE
 
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Set up Java
-      uses: actions/setup-java@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v3  # Updated to v3
       with:
-        distribution: 'zulu'
-        java-version: '17'
+        java-version: '17'            # Specify the version of Java you need
+        distribution: 'temurin'       # Use 'temurin' instead of 'adopt'
 
-    - name: Install Launch4j using winget
-      run: winget install --id Launch4j.Launch4j --exact --silent
+    - name: Build with Maven
+      run: mvn clean package          # Adjust if you're using Gradle or another build tool
 
-    # Alternatively, download Launch4j directly if winget fails
-    - name: Download Launch4j
-      if: failure()
+    - name: Create EXE
       run: |
-        Invoke-WebRequest -Uri "https://downloads.sourceforge.net/project/launch4j/launch4j-3.14-win32.zip" -OutFile "launch4j.zip"
-        Expand-Archive -Path "launch4j.zip" -DestinationPath "launch4j"
-        $env:Path += ";${{ github.workspace }}\launch4j"
-        echo $env:Path
+        # Use Launch4j or similar tool to wrap your JAR into an EXE
+        launch4j myapp.xml
 
-    - name: Verify Launch4j Installation
-      run: launch4j --version
-
-    - name: Create .exe with Launch4j
-      run: |
-        launch4j --config launch4j-config.xml
-
-    - name: Upload .exe as artifact
-      uses: actions/upload-artifact@v3
+    - name: Upload EXE artifact
+      uses: actions/upload-artifact@v4  # Updated to v4
       with:
-        name: game-executable
-        path: path/to/output.exe
+        name: myapp-executable
+        path: path/to/your/exe/myapp.exe  # Adjust the path accordingly
