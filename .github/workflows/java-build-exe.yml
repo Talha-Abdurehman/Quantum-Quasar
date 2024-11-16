@@ -31,9 +31,9 @@ jobs:
         curl -L -o launch4j-windows.zip "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download"
         Expand-Archive -Path "launch4j-windows.zip" -DestinationPath "launch4j"
 
-    - name: Fix Line Endings for Launch4j Script
-      run: |
-        (Get-Content launch4j\launch4j.ps1) | Set-Content launch4j\launch4j.ps1  # Ensure correct line endings if needed
+    # - name: Fix Line Endings for Launch4j Script
+    #   run: |
+    #     (Get-Content launch4j\launch4j.ps1) | Set-Content launch4j\launch4j.ps1  # Ensure correct line endings if needed
 
     - name: Create EXE
       run: |
