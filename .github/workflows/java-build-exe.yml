@@ -31,7 +31,6 @@ jobs:
         wget https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux-x64.tgz/download -O launch4j-linux.tgz
         tar -xzf launch4j-linux.tgz
         ls -l  # List contents of current directory for debugging
-        ls -l launch4j  # Check if the expected directory exists
 
     - name: Create EXE
       run: |
@@ -43,8 +42,11 @@ jobs:
           exit 1
         fi
 
+    - name: List Launch4j Directory
+      run: ls -l launch4j  # Check if myapp.exe was created
+
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
       with:
         name: myapp-executable
-        path: ./launch4j/myapp.exe  # Adjust the path accordingly
+        path: ./launch4j/myapp.exe  # Ensure this path is correct based on previous checks
