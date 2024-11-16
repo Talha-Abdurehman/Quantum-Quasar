@@ -2,15 +2,15 @@
 <launch4jConfig>
     <dontWrapJar>false</dontWrapJar>
     <headerType>gui</headerType>
-    <jar>target/TopDownShooter-1.0-SNAPSHOT.jar</jar>
-    <outfile>your-output.exe</outfile>
+    <jar>target/TopDownShooter-1.0-SNAPSHOT.jar</jar> <!-- Ensure this path is correct -->
+    <outfile>myapp.exe</outfile> <!-- Change output name here -->
     <errTitle>Your Application Error</errTitle>
     <cmdLine></cmdLine>
     <chdir>.</chdir>
-    
+
     <jre>
-        <path>%JAVA_HOME%</path> <!-- Use JAVA_HOME as the JRE path -->
-        <minVersion>11</minVersion> <!-- Adjust if necessary -->
+        <path>%JAVA_HOME%</path> <!-- Use JAVA_HOME as needed -->
+        <minVersion>11</minVersion>
         <maxVersion></maxVersion>
     </jre>
 </launch4jConfig>
