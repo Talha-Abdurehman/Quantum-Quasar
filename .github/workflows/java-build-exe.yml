@@ -26,6 +26,7 @@ jobs:
         run: |
           mkdir output
           move target\*.jar output\myapp.jar  # Adjust the filename as needed
+          if (Test-Path "myapp.jar") { Remove-Item "myapp.jar" }  # Remove existing JAR if it exists
           move output\myapp.jar .  # Move JAR to root of repo
 
       - name: Download Launch4j
