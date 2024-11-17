@@ -60,18 +60,20 @@ jobs:
               exit 1
           }
 
-      - name: List Files After Conversion
-        run: |
-          cd launch4j\launch4j  # Change to the correct directory again if needed
-          Get-ChildItem | Select-Object FullName  # List all files in the directory after conversion
-
-      - name: Move EXE to Root Directory
+      - name: Check and Replace EXE in Root Directory
         run: |
           if (Test-Path ".\myapp.exe") {
-              move .\myapp.exe ..\myapp.exe  # Move EXE to root of repo if it exists
-              Write-Host "Moved myapp.exe to root directory."
+              Remove-Item ".\myapp.exe"  # Remove existing EXE if it exists
+              Write-Host "Removed existing myapp.exe"
           } else {
-              Write-Host "myapp.exe not found in launch4j directory!"
+              Write-Host "No existing myapp.exe found."
+          }
+          
+          if (Test-Path ".\launch4j\launch4j\myapp.exe") {
+              Move-Item ".\launch4j\launch4j\myapp.exe" ".\"  # Move new EXE to root directory
+              Write-Host "Moved new myapp.exe to root directory."
+          } else {
+              Write-Host "New myapp.exe not found in launch4j directory!"
               exit 1
           }
 
