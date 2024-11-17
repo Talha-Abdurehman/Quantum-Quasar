@@ -47,7 +47,7 @@ jobs:
           echo '<launch4jConfig>' >> config.xml
           echo '  <output>myapp.exe</output>' >> config.xml
           echo '  <jar>myapp.jar</jar>' >> config.xml
-          echo '  <minVersion>1.8.0</minVersion>' >> config.xml
+          echo '  <minVersion></minVersion>' >> config.xml  # Leave min/max empty for testing
           echo '  <headerType>gui</headerType>' >> config.xml
           echo '</launch4jConfig>' >> config.xml
 
