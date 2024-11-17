@@ -47,18 +47,22 @@ jobs:
           echo '<launch4jConfig>' >> config.xml
           echo '  <output>myapp.exe</output>' >> config.xml  # Ensure this matches your desired output name
           echo '  <jar>myapp.jar</jar>' >> config.xml
-          echo '  <minVersion>1.8.0</minVersion>' >> config.xml
           echo '  <headerType>gui</headerType>' >> config.xml
           echo '</launch4jConfig>' >> config.xml
 
           echo "Running Launch4j..."
           
           if (Test-Path ".\launch4j.exe") {
-              .\launch4j.exe config.xml  # Use launch4j.exe for GUI mode (command line)
+              .\launch4j.exe config.xml | Out-Host  # Execute and display output from Launch4j
           } else {
               Write-Host "launch4j.exe not found!"
               exit 1
           }
+
+      - name: List Files After Conversion
+        run: |
+          cd launch4j\launch4j  # Change to the correct directory again if needed
+          Get-ChildItem | Select-Object FullName  # List all files in the directory after conversion
 
       - name: Check and Replace EXE in Root Directory
         run: |
