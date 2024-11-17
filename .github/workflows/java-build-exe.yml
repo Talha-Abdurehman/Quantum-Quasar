@@ -1,74 +1,105 @@
-name: Java Build EXE 
+name: Build JAR
 
 on:
   push:
     branches:
-      - master
-  workflow_dispatch:
+      - master  # Change this to your default branch if it's different
 
 jobs:
   build:
-    runs-on: windows-latest  # Use Windows runner
+    runs-on: windows-latest  # Use Windows for the build environment
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'  # Specify your desired Java version
+          distribution: 'temurin'  # Use Temurin distribution
 
-    - name: Build with Maven
-      run: mvn clean package
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
 
-    - name: List Target Directory
-      run: dir target  # Use 'dir' for Windows
+      - name: Move JAR to root
+        run: |
+          mkdir output
+          move target\*.jar output\myapp.jar  # Adjust the filename as needed
+          move output\myapp.jar .  # Move JAR to root of repo
 
-    - name: List Root Directory
-      run: dir  # List all files in the root directory to check for myapp.xml
 
-    - name: Download Launch4j
-      run: |
-        curl -L -o launch4j-windows.zip "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download"
-        Expand-Archive -Path "launch4j-windows.zip" -DestinationPath "launch4j"
+# name: Java Build EXE 
 
-    - name: List Launch4j Directory
-      run: dir launch4j  # List contents of launch4j directory to verify installation
+# on:
+#   push:
+#     branches:
+#       - master
+#   workflow_dispatch:
 
-    - name: List Inner Launch4j Directory
-      run: dir launch4j\launch4j  # List contents of the inner launch4j directory
+# jobs:
+#   build:
+#     runs-on: windows-latest  # Use Windows runner
 
-    - name: Create EXE
-      run: |
-        Write-Host "Current Directory:"
-        Get-Location  # Print current working directory
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Set up JDK
+#       uses: actions/setup-java@v3
+#       with:
+#         java-version: '17'
+#         distribution: 'temurin'
+
+#     - name: Build with Maven
+#       run: mvn clean package
+
+#     - name: List Target Directory
+#       run: dir target  # Use 'dir' for Windows
+
+#     - name: List Root Directory
+#       run: dir  # List all files in the root directory to check for myapp.xml
+
+#     - name: Download Launch4j
+#       run: |
+#         curl -L -o launch4j-windows.zip "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download"
+#         Expand-Archive -Path "launch4j-windows.zip" -DestinationPath "launch4j"
+
+#     - name: List Launch4j Directory
+#       run: dir launch4j  # List contents of launch4j directory to verify installation
+
+#     - name: List Inner Launch4j Directory
+#       run: dir launch4j\launch4j  # List contents of the inner launch4j directory
+
+#     - name: Create EXE
+#       run: |
+#         Write-Host "Current Directory:"
+#         Get-Location  # Print current working directory
         
-        if (Test-Path "myapp.xml") {
-          & ".\launch4j\launch4j\launch4j.exe" "D:\a\Quantum-Quasar\Quantum-Quasar\myapp.xml"  # Use full path to myapp.xml
-        } else {
-          Write-Host "myapp.xml does not exist."
-          exit 1
-        }
+#         if (Test-Path "myapp.xml") {
+#           & ".\launch4j\launch4j\launch4j.exe" "D:\a\Quantum-Quasar\Quantum-Quasar\myapp.xml"  # Use full path to myapp.xml
+#         } else {
+#           Write-Host "myapp.xml does not exist."
+#           exit 1
+#         }
 
-    - name: List Current Directory After Creation
-      run: dir  # List current directory to check for myapp.exe
+#     - name: List Current Directory After Creation
+#       run: dir  # List current directory to check for myapp.exe
 
-    - name: Upload EXE artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: myapp-executable
-        path: .\myapp.exe  # Adjust this path based on where myapp.exe is found
+#     - name: Upload EXE artifact
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: myapp-executable
+#         path: .\myapp.exe  # Adjust this path based on where myapp.exe is found
 
-    - name: Commit and Push EXE to Repository
-      env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Talha-Abdurehman/Quantum-Quasar.git
+#     - name: Commit and Push EXE to Repository
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#       run: |
+#         git config --global user.name "github-actions[bot]"
+#         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#         git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/Talha-Abdurehman/Quantum-Quasar.git
         
-        git add .\myapp.exe  # Adjust this path based on where myapp.exe is found
-        git commit -m "Add new version of myapp.exe"
-        git push || echo "No changes to commit."
+#         git add .\myapp.exe  # Adjust this path based on where myapp.exe is found
+#         git commit -m "Add new version of myapp.exe"
+#         git push || echo "No changes to commit."
