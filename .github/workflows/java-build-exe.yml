@@ -53,7 +53,8 @@ jobs:
           echo "Running Launch4j..."
           
           if (Test-Path ".\launch4j.exe") {
-              .\launch4j.exe config.xml | Out-Host  # Execute and display output from Launch4j
+              Start-Process ".\launch4j.exe" -ArgumentList "config.xml" -Wait -NoNewWindow -ErrorAction Stop | Out-Host
+              Write-Host "Launch4j executed successfully."
           } else {
               Write-Host "launch4j.exe not found!"
               exit 1
