@@ -45,7 +45,7 @@ jobs:
           echo "Creating XML configuration for Launch4j..."
           echo '<?xml version="1.0" encoding="UTF-8"?>' > config.xml
           echo '<launch4jConfig>' >> config.xml
-          echo '  <output>myapp.exe</output>' >> config.xml
+          echo '  <output>myapp.exe</output>' >> config.xml  # Ensure this matches your desired output name
           echo '  <jar>myapp.jar</jar>' >> config.xml
           echo '  <minVersion>1.8.0</minVersion>' >> config.xml
           echo '  <headerType>gui</headerType>' >> config.xml
@@ -60,11 +60,26 @@ jobs:
               exit 1
           }
 
+      - name: List Files After Conversion
+        run: |
+          cd launch4j\launch4j  # Change to the correct directory again if needed
+          Get-ChildItem | Select-Object FullName  # List all files in the directory after conversion
+
+      - name: Move EXE to Root Directory
+        run: |
+          if (Test-Path ".\myapp.exe") {
+              move .\myapp.exe ..\myapp.exe  # Move EXE to root of repo if it exists
+              Write-Host "Moved myapp.exe to root directory."
+          } else {
+              Write-Host "myapp.exe not found in launch4j directory!"
+              exit 1
+          }
+
       - name: Commit and push JAR and EXE to repository
         run: |
           git config --local user.name "GitHub Action"
           git config --local user.email "action@github.com"
-          git add myapp.jar myapp.exe  # Add both JAR and EXE files
+          git add myapp.jar myapp.exe  # Add both JAR and EXE files (if created)
           git commit -m "Add built JAR and EXE files"
           git push origin master  # Push changes to master branch
         env:
