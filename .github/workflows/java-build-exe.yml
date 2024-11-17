@@ -46,8 +46,8 @@ jobs:
           echo '  <headerType>gui</headerType>' >> config.xml
           echo '</launch4jConfig>' >> config.xml
 
-          echo "Running Launch4j..."
-          .\launch4j.exe config.xml
+          echo "Running Launch4jc..."
+          .\launch4jc.exe config.xml  # Use launch4jc.exe for console mode
 
       - name: Commit and push JAR and EXE to repository
         run: |
