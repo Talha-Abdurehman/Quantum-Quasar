@@ -8,9 +8,9 @@ import java.awt.event.MouseMotionListener;
 
 public class MouseInput implements MouseListener, MouseMotionListener {
 
-    private GamePanel gamePanel;
+    private final GamePanel gamePanel;
 
-    public MouseInput(GamePanel gamePanel){
+    public MouseInput(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
     }
 
