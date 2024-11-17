@@ -1,12 +1,10 @@
 package org.example;
 
-import java.awt.*;
-
-public class Game implements Runnable{
+public class Game implements Runnable {
     private final int FPS_SET = 120;
     private Thread thread;
-    private GamePanel gamePanel;
-    private GameWindow gameWindow;
+    private final GamePanel gamePanel;
+    private final GameWindow gameWindow;
 
 
     public Game() {
@@ -17,7 +15,7 @@ public class Game implements Runnable{
     }
 
 
-    private void startGameLoop(){
+    private void startGameLoop() {
         thread = new Thread(this);
         thread.start();
     }
@@ -25,17 +23,17 @@ public class Game implements Runnable{
     @Override
     public void run() {
 
-        double timePerFrame =  1000000000.0 / FPS_SET;
+        double timePerFrame = 1000000000.0 / FPS_SET;
         long lastFrame = System.nanoTime();
         long now = System.nanoTime();
         int frames = 0;
         long lastCheck = System.currentTimeMillis();
 
 
-        while(true) {
+        while (true) {
 
             now = System.nanoTime();
-            if(now - lastFrame >= timePerFrame) {
+            if (now - lastFrame >= timePerFrame) {
                 gamePanel.repaint();
                 lastFrame = now;
                 frames++;
@@ -43,7 +41,7 @@ public class Game implements Runnable{
             }
 
 
-            if(System.currentTimeMillis() - lastCheck >= 1000) {
+            if (System.currentTimeMillis() - lastCheck >= 1000) {
                 lastCheck = System.currentTimeMillis();
                 System.out.println("FPS: " + frames);
                 frames = 0;

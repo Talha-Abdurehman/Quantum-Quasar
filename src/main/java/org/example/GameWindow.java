@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class GameWindow {
 
-    public GameWindow(GamePanel gamePanel){
+    public GameWindow(GamePanel gamePanel) {
         System.out.println("Gayme has begun");
         JFrame frame = new JFrame();
         frame.add(gamePanel);
