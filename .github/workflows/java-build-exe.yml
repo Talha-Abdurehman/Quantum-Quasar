@@ -47,29 +47,24 @@ jobs:
           echo '<launch4jConfig>' >> config.xml
           echo '  <output>myapp.exe</output>' >> config.xml
           echo '  <jar>myapp.jar</jar>' >> config.xml
-          echo '  <minVersion></minVersion>' >> config.xml  # Leave min/max empty for testing
+          echo '  <minVersion>1.8.0</minVersion>' >> config.xml
           echo '  <headerType>gui</headerType>' >> config.xml
           echo '</launch4jConfig>' >> config.xml
 
           echo "Running Launch4j..."
           
           if (Test-Path ".\launch4j.exe") {
-              .\launch4j.exe config.xml | Out-Host  # Execute and display output from Launch4j
+              .\launch4j.exe config.xml  # Use launch4j.exe for GUI mode (command line)
           } else {
               Write-Host "launch4j.exe not found!"
               exit 1
           }
 
-      - name: List Files After Conversion
-        run: |
-          cd launch4j\launch4j  # Change to the correct directory again if needed
-          Get-ChildItem | Select-Object FullName  # List all files in the directory after conversion
-
       - name: Commit and push JAR and EXE to repository
         run: |
           git config --local user.name "GitHub Action"
           git config --local user.email "action@github.com"
-          git add myapp.jar myapp.exe  # Add both JAR and EXE files (if created)
+          git add myapp.jar myapp.exe  # Add both JAR and EXE files
           git commit -m "Add built JAR and EXE files"
           git push origin master  # Push changes to master branch
         env:
