@@ -41,7 +41,7 @@ jobs:
 
       - name: Convert JAR to EXE with Launch4j
         run: |
-          cd launch4j
+          cd launch4j\launch4j  # Change to the correct directory where launch4jc.exe is located
           echo "Creating XML configuration for Launch4j..."
           echo '<?xml version="1.0" encoding="UTF-8"?>' > config.xml
           echo '<launch4jConfig>' >> config.xml
@@ -53,7 +53,6 @@ jobs:
 
           echo "Running Launch4jc..."
           
-          # Adjust this path based on the actual location found in the previous step.
           if (Test-Path ".\launch4jc.exe") {
               .\launch4jc.exe config.xml  # Use launch4jc.exe for console mode
           } else {
