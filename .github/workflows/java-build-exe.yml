@@ -53,10 +53,10 @@ jobs:
 
           echo "Running Launch4jc..."
           
-          if (Test-Path ".\launch4jc.exe") {
-              .\launch4jc.exe config.xml  # Use launch4jc.exe for console mode
+          if (Test-Path ".\launch4j.exe") {
+              .\launch4j.exe config.xml  # Use launch4jc.exe for console mode
           } else {
-              Write-Host "launch4jc.exe not found!"
+              Write-Host "launch4j.exe not found!"
               exit 1
           }
 
