@@ -34,10 +34,10 @@ jobs:
           curl -L -o launch4j.zip "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-win32.zip/download"
           Expand-Archive -Path launch4j.zip -DestinationPath launch4j
 
-      - name: List Launch4j Directory Contents
+      - name: List Launch4j Directory Contents Recursively
         run: |
           cd launch4j
-          dir  # List contents of the directory to verify presence of launch4jc.exe
+          Get-ChildItem -Recurse | Select-Object FullName  # List all files recursively
 
       - name: Convert JAR to EXE with Launch4j
         run: |
@@ -52,7 +52,9 @@ jobs:
           echo '</launch4jConfig>' >> config.xml
 
           echo "Running Launch4jc..."
-          if (Test-Path "launch4jc.exe") {
+          
+          # Adjust this path based on the actual location found in the previous step.
+          if (Test-Path ".\launch4jc.exe") {
               .\launch4jc.exe config.xml  # Use launch4jc.exe for console mode
           } else {
               Write-Host "launch4jc.exe not found!"
