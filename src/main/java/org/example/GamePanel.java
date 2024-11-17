@@ -2,26 +2,48 @@ package org.example;
 
 import org.inputs.KeyboardInputs;
 import org.inputs.MouseInput;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
 
 
 public class GamePanel extends JPanel {
 
-    private int frames = 0;
-    private long lastCheck = 0;
     int HEIGHT = 300;
     int WIDTH = 100;
+    private BufferedImage img;
 
     private float XDelta = 100, YDelta = 100;
-    private float XDir = 1f, YDir = 1f;
+
     public GamePanel(){
         MouseInput mouseinput = new MouseInput(this);
         System.out.println("GayPanel Working");
+        setPanelSize();
+        importImg();
         addKeyListener(new KeyboardInputs(this));
         addMouseListener(mouseinput);
         addMouseMotionListener(mouseinput);
 
+    }
+
+    private void importImg() {
+        InputStream istr = getClass().getResourceAsStream("/Nautolan_Ship_Battlecruiser_Base.png");
+        try {
+            img = ImageIO.read(istr);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void setPanelSize() {
+        Dimension size = new Dimension(1280,800);
+        setPreferredSize(size);
     }
 
     //===================================================
@@ -42,30 +64,10 @@ public class GamePanel extends JPanel {
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        updateRect();
-        g.setColor(Color.red);
-        g.fillRect((int)XDelta,(int)YDelta,WIDTH,HEIGHT);
+
+        g.drawImage(img,(int)XDelta - 50,(int)YDelta - 50,null);
+
 
     }
-
-    public void updateRect() {
-        XDelta += XDir;
-
-        if(XDelta > 800 || XDelta < 0){
-            XDir*=-1;
-        }
-
-        YDelta += YDir;
-        if(YDelta > 600 || YDelta < 0) {
-            YDir *= -1;
-        }
-
-    }
-
-
-    public void setRect(int x, int y){
-        this.XDelta = x;
-        this.YDelta = y;
-        repaint();
-    }
+    
 }

@@ -1,5 +1,7 @@
 package org.example;
 
+import java.awt.*;
+
 public class Game implements Runnable{
     private final int FPS_SET = 120;
     private Thread thread;
@@ -13,6 +15,7 @@ public class Game implements Runnable{
         gamePanel.requestFocus();
         startGameLoop();
     }
+
 
     private void startGameLoop(){
         thread = new Thread(this);
