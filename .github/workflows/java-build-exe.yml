@@ -31,7 +31,7 @@ jobs:
 
       - name: Download Launch4j
         run: |
-          Invoke-WebRequest -Uri "https://launch4j.sourceforge.net/download/launch4j-3.14-win.zip" -OutFile "launch4j.zip"
+          Invoke-WebRequest -Uri "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-win32.zip/download" -OutFile "launch4j.zip"
           Expand-Archive -Path launch4j.zip -DestinationPath launch4j
 
       - name: Convert JAR to EXE with Launch4j
