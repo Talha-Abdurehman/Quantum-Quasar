@@ -3,7 +3,7 @@ name: Build JAR
 on:
   push:
     branches:
-      - master  # Change this to your default branch if it's different
+      - master  # Trigger on pushes to the master branch
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '17'  # Specify your desired Java version
+          java-version: '17'  # Specify Java version 17
           distribution: 'temurin'  # Use Temurin distribution
 
       - name: Build with Maven
@@ -27,6 +27,16 @@ jobs:
           mkdir output
           move target\*.jar output\myapp.jar  # Adjust the filename as needed
           move output\myapp.jar .  # Move JAR to root of repo
+
+      - name: Commit and push JAR to repository
+        run: |
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+          git add myapp.jar  # Adjust if your JAR file has a different name
+          git commit -m "Add built JAR file"
+          git push origin master  # Push changes to master branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Automatically provided token for authentication
 
 
 # name: Java Build EXE 
