@@ -24,10 +24,12 @@ public class KeyboardInputs implements KeyListener {
             case KeyEvent.VK_W:
                 System.out.println("W Pressed");
                 gamePanel.changeYDelta(-5);
+                gamePanel.playerAction = 1;
                 break;
             case KeyEvent.VK_S:
                 System.out.println("S Pressed");
                 gamePanel.changeYDelta(5);
+                gamePanel.playerAction = 0;
                 break;
             case KeyEvent.VK_A:
                 System.out.println("A Pressed");
@@ -40,11 +42,19 @@ public class KeyboardInputs implements KeyListener {
             case KeyEvent.VK_SPACE:
                 System.out.println("Space Bar Pressed");
                 break;
+            default:
+                System.out.println("NO Key being Pressed");
+                break;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+
+        switch (e.getKeyCode()){
+            case KeyEvent.VK_W:
+                gamePanel.playerAction = 0;
+        }
 
 
     }
