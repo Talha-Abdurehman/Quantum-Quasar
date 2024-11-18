@@ -2,6 +2,7 @@ package org.example;
 
 import org.inputs.KeyboardInputs;
 import org.inputs.MouseInput;
+import static org.constants.Constants.PlayerConstants.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,11 +15,12 @@ public class GamePanel extends JPanel {
 
     int HEIGHT = 300;
     int WIDTH = 100;
-    private BufferedImage img, engineImg;
-    private BufferedImage[] idleAnim,engineAnim;
+    private BufferedImage img, engineImg,baseEngImg;
+    private BufferedImage[][] animations;
     private int animTick, animIndex, animspeed = 13;
+    public int playerAction = IDLE;
 
-    private float XDelta = 100, YDelta = 100;
+    private int XDelta = 100, YDelta = 100;
 
     public GamePanel() {
         MouseInput mouseinput = new MouseInput(this);
@@ -33,23 +35,26 @@ public class GamePanel extends JPanel {
     }
 
     private void importAnim() {
-        idleAnim = new BufferedImage[9];
-        engineAnim = new BufferedImage[8];
+        animations = new BufferedImage[2][4];
 
-        for(int i = 0; i < idleAnim.length; i++){
-            idleAnim[i] = img.getSubimage(i*128,0,128,128);
-        }
-        for(int j = 0; j < engineAnim.length; j++){
-            engineAnim[j] = engineImg.getSubimage(j*128,0,128,128);
+
+        for(int i = 0; i < animations.length; i++){
+
+            for(int j = 0; j < animations[i].length;j++){
+                animations[i][j] = engineImg.getSubimage(j*48,i*48,48,48);
+
+            }
         }
     }
 
     private void importImg() {
-        InputStream istr = getClass().getResourceAsStream("/Nautolan_Ship_Battlecruiser_Weapons.png");
-        InputStream istr1 = getClass().getResourceAsStream("/Nautolan_Ship_Battlecruiser_Engine_Effect.png");
+        InputStream istr = getClass().getResourceAsStream("/Main_Ship_Base_Full_health.png");
+        InputStream istr1 = getClass().getResourceAsStream("/Main_Ship_Engines_Supercharged_Engine_Spritesheet.png");
+        InputStream istr2 = getClass().getResourceAsStream("/Main_Ship_Engines_Base_Engine.png");
         try {
             img = ImageIO.read(istr);
             engineImg = ImageIO.read(istr1);
+            baseEngImg = ImageIO.read(istr2);
 
             if (img == null || engineImg == null) {
                 throw new Exception("One or more images could not be loaded.");
@@ -87,8 +92,13 @@ public class GamePanel extends JPanel {
 
         updateAnimationTicker();
 
-        g.drawImage(idleAnim[animIndex], 100, 100, null);
-        g.drawImage(engineAnim[animIndex], 100, 100, null);
+
+        g.drawImage(animations[playerAction][animIndex],XDelta,YDelta, 200, 160, null);
+        g.drawImage(baseEngImg,XDelta,YDelta,200,160,null);
+        g.drawImage(img,XDelta,YDelta, 200, 160, null);
+
+
+
 
     }
 
@@ -98,7 +108,7 @@ public class GamePanel extends JPanel {
             animTick = 0;
             animIndex++;
 
-            if(animIndex >= idleAnim.length) {
+            if(animIndex >= animations.length) {
                 animIndex = 0;
             }
         }
