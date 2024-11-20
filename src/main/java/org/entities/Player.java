@@ -1,20 +1,24 @@
 package org.entities;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import static org.constants.Constants.PlayerConstants.*;
 
 public class Player extends Entity {
 
+    ArrayList<Bullet> bullets = new ArrayList<>();
     public int playerAction = IDLE;
     public int playerAttack = ATTACK_0;
-    private BufferedImage img, engineImg, baseEngImg, cannonImg;
+    private BufferedImage img, engineImg, baseEngImg, cannonImg, bulletImg;
     private BufferedImage[][] animations;
-    private BufferedImage[] attackAnim;
+    private BufferedImage[] attackAnim, bulletAnim;
     private int animTick, moveIndex, atkIndex, animspeed = 13;
     private boolean moving, attacking = false;
     private int playerDir = -1;
@@ -25,6 +29,7 @@ public class Player extends Entity {
     public Player(float x, float y) {
         super(x, y);
         loadAnimations();
+        System.out.println();
     }
 
     // Update method for updating the player
@@ -43,9 +48,9 @@ public class Player extends Entity {
         else
             playerAction = IDLE;
 
-        if (attacking)
+        if (attacking) {
             playerAttack = ATTACK_1;
-        else
+        } else
             playerAttack = ATTACK_0;
 
         if (startAnim != playerAction)
@@ -61,6 +66,7 @@ public class Player extends Entity {
         atkIndex = 0;
     }
 
+
     public void render(Graphics g) {
 
 
@@ -69,13 +75,12 @@ public class Player extends Entity {
         g.drawImage(img, (int) x, (int) y, 200, 160, null);
         g.drawImage(attackAnim[atkIndex], (int) x, (int) y, 200, 160, null);
 
-
     }
 
 
     private void loadAnimations() {
         InputStream istr = getClass().getResourceAsStream("/Main_Ship_Base_Full_health.png");
-        InputStream istr1 = getClass().getResourceAsStream("/Main_Ship_Engines_Supercharged_Engine_Spritesheet.png");
+        InputStream istr1 = getClass().getResourceAsStream("/Main_Ship_Engines_Base Engine_Spritesheet.png");
         InputStream istr2 = getClass().getResourceAsStream("/Main_Ship_Engines_Base_Engine.png");
         InputStream istr3 = getClass().getResourceAsStream("/Main_Ship_Weapons_Auto_Cannon.png");
         try {
@@ -84,19 +89,21 @@ public class Player extends Entity {
             baseEngImg = ImageIO.read(istr2);
             cannonImg = ImageIO.read(istr3);
 
+
             animations = new BufferedImage[2][4];
             attackAnim = new BufferedImage[7];
 
 
+            // MOVEMENT ANIMATION ===============================================================
             for (int i = 0; i < animations.length; i++) {
                 for (int j = 0; j < animations[i].length; j++) {
                     animations[i][j] = engineImg.getSubimage(j * 48, i * 48, 48, 48);
                 }
             }
 
+            // ATTACK & BULLET ANIMATION ===============================================================
             for (int i = 0; i < attackAnim.length; i++) {
                 attackAnim[i] = cannonImg.getSubimage(i * 48, 0, 48, 48);
-
             }
 
             if (img == null || engineImg == null) {
@@ -208,5 +215,26 @@ public class Player extends Entity {
         this.down = down;
     }
 
+    public void createBullet() {
+        bullets.add(new Bullet((int) x, (int) y));
+    }
 
+    public void updateBullet() {
+        Iterator<Bullet> iterator = bullets.iterator();
+
+        while (iterator.hasNext()) {
+            Bullet bullet = iterator.next();
+            bullet.update();
+            if (bullet.isOffscreen()) {
+                iterator.remove();
+            }
+        }
+
+    }
+
+    public void drawBullets(Graphics g) {
+        for (Bullet bullet : bullets) {
+            bullet.drawBullet(g);
+        }
+    }
 }
