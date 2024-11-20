@@ -4,11 +4,14 @@ import org.example.GamePanel;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.sql.Time;
+import java.util.concurrent.TimeUnit;
 
 import static org.constants.Constants.PlayerConstants.*;
 
 public class KeyboardInputs implements KeyListener {
     private final GamePanel gamePanel;
+
 
     public KeyboardInputs(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
@@ -36,6 +39,8 @@ public class KeyboardInputs implements KeyListener {
                 break;
             case KeyEvent.VK_SPACE:
                 gamePanel.getGame().getPlayer().setAttacking(false);
+                break;
+
 
         }
     }
@@ -57,6 +62,9 @@ public class KeyboardInputs implements KeyListener {
                 break;
             case KeyEvent.VK_SPACE:
                 gamePanel.getGame().getPlayer().setAttacking(true);
+                gamePanel.getGame().getPlayer().createBullet();
+                break;
+
         }
     }
 }

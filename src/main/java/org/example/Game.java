@@ -1,5 +1,6 @@
 package org.example;
 
+import org.entities.Bullet;
 import org.entities.Player;
 
 import java.awt.*;
@@ -10,7 +11,6 @@ public class Game implements Runnable {
     private Thread thread;
     private final GamePanel gamePanel;
     private final GameWindow gameWindow;
-
     private Player player;
 
     public Game() {
@@ -19,6 +19,8 @@ public class Game implements Runnable {
         gameWindow = new GameWindow(gamePanel);
         gamePanel.requestFocus();
         startGameLoop();
+
+
     }
 
     private void initClasses() {
@@ -34,10 +36,13 @@ public class Game implements Runnable {
 
     public void update() {
         player.update();
+        player.updateBullet();
+
     }
 
     public void render(Graphics g) {
         player.render(g);
+        player.drawBullets(g);
     }
 
     @Override
@@ -89,4 +94,5 @@ public class Game implements Runnable {
     public Player getPlayer() {
         return player;
     }
+
 }
