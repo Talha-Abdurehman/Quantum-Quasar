@@ -4,6 +4,8 @@ import org.inputs.KeyboardInputs;
 import org.inputs.MouseInput;
 
 import static org.constants.Constants.PlayerConstants.*;
+import static org.example.Game.GAME_HEIGHT;
+import static org.example.Game.GAME_WIDTH;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,7 +28,7 @@ public class GamePanel extends JPanel {
     }
 
     private void setPanelSize() {
-        Dimension size = new Dimension(1280, 800);
+        Dimension size = new Dimension(GAME_WIDTH, GAME_HEIGHT);
         setPreferredSize(size);
     }
 
