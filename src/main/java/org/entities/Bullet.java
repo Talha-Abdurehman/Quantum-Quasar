@@ -70,7 +70,7 @@ public class Bullet {
     }
 
     public boolean isOffscreen() {
-        if (y == -500) {
+        if (y == -300) {
             return true;
         } else {
             return false;

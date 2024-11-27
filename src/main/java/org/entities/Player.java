@@ -19,15 +19,16 @@ public class Player extends Entity {
     private BufferedImage img, engineImg, baseEngImg, cannonImg, bulletImg;
     private BufferedImage[][] animations;
     private BufferedImage[] attackAnim, bulletAnim;
-    private int animTick, moveIndex, atkIndex, animspeed = 13;
+    private int animTick, moveIndex, animspeed = 13;
+    private int atkspeed, atkIndex, atkTick = 5;
     private boolean moving, attacking = false;
     private int playerDir = -1;
     private boolean left, up, right, down;
 
     private float playerSpeed = 1.5f;
 
-    public Player(float x, float y) {
-        super(x, y);
+    public Player(float x, float y, int width, int height) {
+        super(x, y, width, height);
         loadAnimations();
         System.out.println();
     }
@@ -62,6 +63,7 @@ public class Player extends Entity {
 
     private void resetAnimTick() {
         animTick = 0;
+        atkTick = 0;
         moveIndex = 0;
         atkIndex = 0;
     }
@@ -160,16 +162,21 @@ public class Player extends Entity {
         if (animTick >= animspeed) {
             animTick = 0;
             moveIndex++;
-            atkIndex++;
 
             if (moveIndex >= getSpriteAmount(playerAction)) {
                 moveIndex = 0;
             }
+        }
+        atkTick++; // Other Animations
+
+        if (atkTick >= atkspeed) {
+            atkTick = 0;
+            atkIndex++;
+
             if (atkIndex >= getAction(playerAttack)) {
                 atkIndex = 0;
             }
-        }
-
+        } // Attack Animation
     }
 
     public void resetDirBooleans() {
