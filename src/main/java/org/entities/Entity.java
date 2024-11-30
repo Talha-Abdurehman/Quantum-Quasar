@@ -25,12 +25,12 @@ public abstract class Entity {
     }
 
     public float getX() {
-        return x;
+        return this.x;
     }
 
 
     public float getY() {
-        return y;
+        return this.y;
     }
 }
 

@@ -24,11 +24,13 @@ public class Player extends Entity {
     private boolean moving, attacking = false;
     private int playerDir = -1;
     private boolean left, up, right, down;
+    private boolean isLocal;
 
     private float playerSpeed = 1.5f;
 
-    public Player(float x, float y, int width, int height) {
+    public Player(float x, float y, int width, int height, boolean isLocal) {
         super(x, y, width, height);
+        this.isLocal = isLocal;
         loadAnimations();
         System.out.println();
     }
@@ -124,28 +126,32 @@ public class Player extends Entity {
     }
 
     private void updatePos() {
-        moving = false;
+        // Keyboard input for local Players
+        if (isLocal) {
+            moving = false;
 
-        if (left && !right) {
-            x -= playerSpeed;
-            moving = true;
-        } else if (right && !left) {
-            x += playerSpeed;
-            moving = true;
+            if (left && !right) {
+                x -= playerSpeed;
+                moving = true;
+            } else if (right && !left) {
+                x += playerSpeed;
+                moving = true;
+            }
+
+            if (up && !down) {
+                y -= playerSpeed;
+                moving = true;
+            } else if (down && !up) {
+                y += playerSpeed;
+                moving = true;
+            }
+
+            if (x < 0) x = 0; // Prevent moving out of bounds (left)
+            if (y < 0) y = 0; // Prevent moving out of bounds (top)
+            if (x > 1080) x = 1080; // Assuming 800 is screen width
+            if (y > 550) y = 550; // Assuming 600 is screen height
         }
 
-        if (up && !down) {
-            y -= playerSpeed;
-            moving = true;
-        } else if (down && !up) {
-            y += playerSpeed;
-            moving = true;
-        }
-
-        if (x < 0) x = 0; // Prevent moving out of bounds (left)
-        if (y < 0) y = 0; // Prevent moving out of bounds (top)
-        if (x > 1080) x = 1080; // Assuming 800 is screen width
-        if (y > 550) y = 550; // Assuming 600 is screen height
     }
 
     public void setDirection(int direction) {
