@@ -3,48 +3,37 @@ package org.multiplayer;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import netscape.javascript.JSObject;
 import org.json.JSONObject;
 
 public class GameClient {
     private Socket socket;
-    String path = "http://localhost:3000";
+    private String path;
+    private NetworkManager.NetworkListener playerUpdateListener;
 
     public GameClient(String path) {
         this.path = path;
-        Connection(path);
+        connect(path);
     }
 
-    public void Connection(String path) {
+    private void connect(String path) {
         try {
             socket = IO.socket(path);
 
-            // Log all events to check for issues
-            socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-                @Override
-                public void call(Object... objects) {
-                    System.out.println("Connected");
-                }
-            });
+            socket.on(Socket.EVENT_CONNECT, args ->
+                    System.out.println("Connected to server"));
 
-            socket.on("newPlayer", args -> {
+            socket.on("playerUpdate", args -> {
                 JSONObject data = (JSONObject) args[0];
-                System.out.println("New Player Joined: " + data);
-            });
-
-            socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
-                @Override
-                public void call(Object... objects) {
-                    System.out.println("Error: " + objects[0]);
+                if (playerUpdateListener != null) {
+                    playerUpdateListener.onPlayerUpdate(data);
                 }
             });
 
-            socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-                @Override
-                public void call(Object... objects) {
-                    System.out.println("Disconnected");
-                }
-            });
+            socket.on(Socket.EVENT_CONNECT_ERROR, args ->
+                    System.out.println("Connection Error: " + args[0]));
+
+            socket.on(Socket.EVENT_DISCONNECT, args ->
+                    System.out.println("Disconnected from server"));
 
             socket.connect();
 
@@ -53,9 +42,13 @@ public class GameClient {
         }
     }
 
+    // Method to set player update listener
+    public void setOnPlayerUpdateListener(NetworkManager.NetworkListener listener) {
+        this.playerUpdateListener = listener;
+    }
+
     public void joinGame(JSONObject initialData) {
         socket.emit("playerJoin", initialData);
-
     }
 
     public void sendPlayerData(JSONObject playerData) {
@@ -65,5 +58,4 @@ public class GameClient {
     public void disconnectPlayer() {
         socket.disconnect();
     }
-
 }

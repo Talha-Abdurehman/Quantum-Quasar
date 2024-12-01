@@ -21,13 +21,14 @@ io.on('connection', (socket) => {
 
     socket.on('playerJoin', (data) => {
         players[socket.id] = data;
-        console.log(data);
+        console.log(`Player: ${socket.id.trim()}`, data);
         socket.broadcast.emit('newPlayer', {id: socket.id, ...data})
     });
 
     // Handle incoming messages from the client
     socket.on('playerUpdate', (data) => {
-        console.log('Received message from client:', data);
+        console.log(`Player: ${socket.id.trim()}`, data);
+        socket.broadcast.emit("playerUpdate", {id: socket.id, ...data})
     });
 
     // Handle disconnect event
