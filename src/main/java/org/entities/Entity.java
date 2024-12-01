@@ -8,6 +8,7 @@ public abstract class Entity {
     protected int width, height;
     protected Rectangle2D.Float hitBox;
 
+
     public Entity(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -24,13 +25,24 @@ public abstract class Entity {
         hitBox = new Rectangle2D.Float(x, y, width, height);
     }
 
+    //X and Y Getters and Setters
     public float getX() {
         return this.x;
     }
 
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
 
     public float getY() {
         return this.y;
     }
+
+    // Id Getters and Setters
+
 }
 

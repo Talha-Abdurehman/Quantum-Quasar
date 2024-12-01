@@ -25,11 +25,17 @@ public class Player extends Entity {
     private int playerDir = -1;
     private boolean left, up, right, down;
     private boolean isLocal;
+    private String id;
+    private float lerp_speed = 0.1f;
+    private float targetX, targetY;
 
     private float playerSpeed = 1.5f;
 
-    public Player(float x, float y, int width, int height, boolean isLocal) {
+    public Player(String id, float x, float y, int width, int height, boolean isLocal) {
         super(x, y, width, height);
+        this.id = id;
+        this.targetX = x;
+        this.targetY = y;
         this.isLocal = isLocal;
         loadAnimations();
         System.out.println();
@@ -249,5 +255,24 @@ public class Player extends Entity {
         for (Bullet bullet : bullets) {
             bullet.drawBullet(g);
         }
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setTargetPos(float targetX, float targetY) {
+        this.targetY = targetY;
+        this.targetX = targetX;
+
+    }
+
+    public void interpolatePos() {
+        x += lerp_speed * (targetX - x);
+        y += lerp_speed * (targetY - y);
+
+        if (Math.abs(targetX - x) < 0.5f) x = targetX;
+        if (Math.abs(targetY - y) < 0.5f) y = targetY;
+
     }
 }
