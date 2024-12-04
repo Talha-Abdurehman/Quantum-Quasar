@@ -26,8 +26,19 @@ public class Player extends Entity {
     private boolean left, up, right, down;
     private boolean isLocal;
     private String id;
-    private float lerp_speed = 0.1f;
+    private static final float MAX_LERP_SPEED = 0.3f;
+    private static final float MIN_LERP_SPEED = 0.05f;
+    private static final long MAX_INTERPOLATION_DELAY = 300;
     private float targetX, targetY;
+    private float predictedX, predictedY;
+    private float velocityX = 0;
+    private float velocityY = 0;
+    private float lastX;
+    private float lastY;
+    private long lastUpdateTime;
+    private long lastUpdateTimestamp = 0;
+    private static final long MAX_INTERPOLATION_TIME = 200;
+    private long lastValidUpdateTimestamp = 0;
 
     private float playerSpeed = 1.5f;
 
@@ -131,33 +142,34 @@ public class Player extends Entity {
 
     }
 
-    private void updatePos() {
-        // Keyboard input for local Players
-        if (isLocal) {
-            moving = false;
+    public void updatePos() {
+        long currentTime = System.currentTimeMillis();
 
-            if (left && !right) {
-                x -= playerSpeed;
-                moving = true;
-            } else if (right && !left) {
-                x += playerSpeed;
-                moving = true;
+        // Calculate time since the last update
+        if (lastUpdateTime != 0) {
+            long deltaTime = currentTime - lastUpdateTime; // In milliseconds
+            if (deltaTime > 0) {
+                velocityX = (x - lastX) / (deltaTime / 1000f); // Convert to seconds
+                velocityY = (y - lastY) / (deltaTime / 1000f); // Convert to seconds
             }
-
-            if (up && !down) {
-                y -= playerSpeed;
-                moving = true;
-            } else if (down && !up) {
-                y += playerSpeed;
-                moving = true;
-            }
-
-            if (x < 0) x = 0; // Prevent moving out of bounds (left)
-            if (y < 0) y = 0; // Prevent moving out of bounds (top)
-            if (x > 1080) x = 1080; // Assuming 800 is screen width
-            if (y > 550) y = 550; // Assuming 600 is screen height
         }
 
+        // Update last known position and time
+        lastX = x;
+        lastY = y;
+        lastUpdateTime = currentTime;
+
+        // Perform movement logic
+        if (isLocal) {
+            if (left && !right) x -= playerSpeed;
+            if (right && !left) x += playerSpeed;
+            if (up && !down) y -= playerSpeed;
+            if (down && !up) y += playerSpeed;
+
+            // Clamp position to bounds
+            x = Math.max(0, Math.min(x, 1080));
+            y = Math.max(0, Math.min(y, 550));
+        }
     }
 
     public void setDirection(int direction) {
@@ -261,18 +273,72 @@ public class Player extends Entity {
         return this.id;
     }
 
-    public void setTargetPos(float targetX, float targetY) {
-        this.targetY = targetY;
-        this.targetX = targetX;
+    public void reconcileWithServer(float serverX, float serverY, long serverTimestamp) {
+        if (serverTimestamp > this.lastValidUpdateTimestamp) {
+            float discrepancy = calculateDistance(x, y, serverX, serverY);
 
+            if (discrepancy > 50f) { // Allow some tolerance
+                // Correct position immediately for large discrepancies
+                x = serverX;
+                y = serverY;
+            } else {
+                // Smoothly adjust for minor discrepancies
+                targetX = serverX;
+                targetY = serverY;
+                interpolatePos();
+            }
+
+            this.lastValidUpdateTimestamp = serverTimestamp;
+        }
     }
+
+
+    private float calculateAdaptiveLerpSpeed(long timeSinceLastUpdate) {
+        float baseSpeed = 0.1f; // Increase base speed for faster corrections
+        float latencyFactor = Math.min(timeSinceLastUpdate / 100f, 1.0f);
+        return baseSpeed + latencyFactor * (MAX_LERP_SPEED - baseSpeed);
+    }
+
+
+    private float calculateDistance(float x1, float y1, float x2, float y2) {
+        return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+
 
     public void interpolatePos() {
-        x += lerp_speed * (targetX - x);
-        y += lerp_speed * (targetY - y);
+        long currentTime = System.currentTimeMillis();
+        long timeSinceLastUpdate = currentTime - lastUpdateTimestamp;
 
-        if (Math.abs(targetX - x) < 0.5f) x = targetX;
-        if (Math.abs(targetY - y) < 0.5f) y = targetY;
+        // More dynamic interpolation
+        float lerpSpeed = calculateAdaptiveLerpSpeed(timeSinceLastUpdate);
 
+        synchronized (this) {
+            // Smoother position adjustment
+            x += lerpSpeed * (targetX - x);
+            y += lerpSpeed * (targetY - y);
+
+            // Precise snapping with more tolerance
+            if (Math.abs(targetX - x) < 1f || timeSinceLastUpdate > MAX_INTERPOLATION_DELAY) {
+                x = targetX;
+                y = targetY;
+            }
+        }
+    }
+
+    private float calculateDynamicLerpSpeed(long timeSinceLastUpdate) {
+        // Faster interpolation if updates are delayed
+        float baseSpeed = 0.1f;
+        float speedMultiplier = Math.min(timeSinceLastUpdate / 100f, 1.0f);
+        return baseSpeed * speedMultiplier;
+    }
+
+    public float getVelocityX() {
+        return velocityX;
+    }
+
+    public float getVelocityY() {
+        return velocityY;
     }
 }
+
+

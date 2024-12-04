@@ -3,6 +3,7 @@ package org.multiplayer;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GameClient {
@@ -25,7 +26,11 @@ public class GameClient {
             socket.on("playerUpdate", args -> {
                 JSONObject data = (JSONObject) args[0];
                 if (playerUpdateListener != null) {
-                    playerUpdateListener.onPlayerUpdate(data);
+                    try {
+                        playerUpdateListener.onPlayerUpdate(data);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
 

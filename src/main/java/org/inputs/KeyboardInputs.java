@@ -27,15 +27,19 @@ public class KeyboardInputs implements KeyListener {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
                 gamePanel.getGame().getPlayer().setUp(false);
+                gamePanel.getGame().getPlayer().setMoving(false);
                 break;
             case KeyEvent.VK_A:
                 gamePanel.getGame().getPlayer().setLeft(false);
+                gamePanel.getGame().getPlayer().setMoving(false);
                 break;
             case KeyEvent.VK_S:
                 gamePanel.getGame().getPlayer().setDown(false);
+                gamePanel.getGame().getPlayer().setMoving(false);
                 break;
             case KeyEvent.VK_D:
                 gamePanel.getGame().getPlayer().setRight(false);
+                gamePanel.getGame().getPlayer().setMoving(false);
                 break;
             case KeyEvent.VK_SPACE:
                 gamePanel.getGame().getPlayer().setAttacking(false);
@@ -50,19 +54,30 @@ public class KeyboardInputs implements KeyListener {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
                 gamePanel.getGame().getPlayer().setUp(true);
+                gamePanel.getGame().getPlayer().setMoving(true);
                 break;
             case KeyEvent.VK_A:
                 gamePanel.getGame().getPlayer().setLeft(true);
+                gamePanel.getGame().getPlayer().setMoving(true);
                 break;
             case KeyEvent.VK_S:
                 gamePanel.getGame().getPlayer().setDown(true);
+                gamePanel.getGame().getPlayer().setMoving(true);
                 break;
             case KeyEvent.VK_D:
                 gamePanel.getGame().getPlayer().setRight(true);
+                gamePanel.getGame().getPlayer().setMoving(true);
                 break;
             case KeyEvent.VK_SPACE:
                 gamePanel.getGame().getPlayer().setAttacking(true);
                 gamePanel.getGame().getPlayer().createBullet();
+                break;
+            case KeyEvent.VK_ESCAPE:
+                gamePanel.getGame().setGameState(true);
+                break;
+            case KeyEvent.VK_P:
+                gamePanel.getGame().setGameState(false);
+                System.out.println("P was pressed");
                 break;
 
         }
