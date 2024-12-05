@@ -1,5 +1,6 @@
 package org.example;
 
+import org.audio.AudioLoader;
 import org.entities.Background;
 import org.entities.Player;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ public class Game implements Runnable {
     private NetworkManager networkManager;
     private long lastNetworkUpdate;
     private Menu menu;
+    private AudioLoader audioLoader;
 
     public Game() {
         initClasses();
@@ -42,11 +44,13 @@ public class Game implements Runnable {
 
     private void initClasses() {
         try {
+            audioLoader = new AudioLoader();
             menu = new Menu();
             background = new Background(GAME_WIDTH, GAME_HEIGHT);
             player = new Player(UUIDGen(), 200, 200, 160, 300, true);
             System.out.println(player.getId());
 
+            audioLoader.playBackground();
             // Initialize NetworkManager
             networkManager = new NetworkManager("http://140.238.160.136:3000/");
 
@@ -225,6 +229,10 @@ public class Game implements Runnable {
 
     public void setGameState(boolean state) {
         this.IS_PAUSED = state;
+    }
+
+    public AudioLoader getAudioLoader() {
+        return audioLoader;
     }
 
     public int getGameState() {

@@ -2,8 +2,11 @@ package org.inputs;
 
 import org.example.GamePanel;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
@@ -71,6 +74,7 @@ public class KeyboardInputs implements KeyListener {
             case KeyEvent.VK_SPACE:
                 gamePanel.getGame().getPlayer().setAttacking(true);
                 gamePanel.getGame().getPlayer().createBullet();
+                gamePanel.getGame().getAudioLoader().playSound();
                 break;
             case KeyEvent.VK_ESCAPE:
                 gamePanel.getGame().setGameState(true);
