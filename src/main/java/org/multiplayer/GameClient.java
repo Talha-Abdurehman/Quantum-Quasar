@@ -2,13 +2,12 @@ package org.multiplayer;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GameClient {
     private Socket socket;
-    private String path;
+    private final String path;
     private NetworkManager.NetworkListener playerUpdateListener;
 
     public GameClient(String path) {

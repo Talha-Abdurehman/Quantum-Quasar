@@ -3,20 +3,16 @@ package org.example;
 import org.inputs.KeyboardInputs;
 import org.inputs.MouseInput;
 
-import static org.constants.Constants.PlayerConstants.*;
-import static org.example.Game.GAME_HEIGHT;
-import static org.example.Game.GAME_WIDTH;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
+
+import static org.example.Game.GAME_HEIGHT;
+import static org.example.Game.GAME_WIDTH;
 
 
 public class GamePanel extends JPanel {
     MouseInput mouseinput = new MouseInput(this);
-    private Game game;
+    private final Game game;
 
     public GamePanel(Game game) {
         this.game = game;
