@@ -4,8 +4,9 @@ public abstract class Enemy extends Entity {
     private int anim_idx;
     private int enemy_state;
     private int type;
-    private int animTick, animSpeed = 25;
-    private int enemyType;
+    private int animTick;
+    private final int animSpeed = 25;
+    private final int enemyType;
 
 
     public Enemy(float x, float y, int width, int height, int enemyType) {

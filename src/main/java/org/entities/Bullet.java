@@ -10,7 +10,9 @@ import java.io.InputStream;
 public class Bullet {
     float x, y;
     int speed;
-    private int animTick, moveIndex, animspeed = 13;
+    private int animTick;
+    private int moveIndex;
+    private final int animspeed = 13;
     private BufferedImage[] bulletAnim;
     private BufferedImage bulletImg;
 
@@ -70,7 +72,7 @@ public class Bullet {
     }
 
     public boolean isOffscreen() {
-        if (y == -300) {
+        if (this.y == -300) {
             return true;
         } else {
             return false;

@@ -1,7 +1,6 @@
 package org.entities;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -16,16 +15,19 @@ public class Player extends Entity {
     ArrayList<Bullet> bullets = new ArrayList<>();
     public int playerAction = IDLE;
     public int playerAttack = ATTACK_0;
+    public int playerHealth = FULL_HEALTH;
     private BufferedImage img, engineImg, baseEngImg, cannonImg, bulletImg;
     private BufferedImage[][] animations;
     private BufferedImage[] attackAnim, bulletAnim;
-    private int animTick, moveIndex, animspeed = 13;
+    private int animTick;
+    private int moveIndex;
+    private final int animspeed = 13;
     private int atkspeed, atkIndex, atkTick = 5;
     private boolean moving, attacking = false;
     private int playerDir = -1;
     private boolean left, up, right, down;
-    private boolean isLocal;
-    private String id;
+    private final boolean isLocal;
+    private final String id;
     private static final float MAX_LERP_SPEED = 0.3f;
     private static final float MIN_LERP_SPEED = 0.05f;
     private static final long MAX_INTERPOLATION_DELAY = 300;
@@ -36,15 +38,17 @@ public class Player extends Entity {
     private float lastX;
     private float lastY;
     private long lastUpdateTime;
-    private long lastUpdateTimestamp = 0;
+    private final long lastUpdateTimestamp = 0;
     private static final long MAX_INTERPOLATION_TIME = 200;
     private long lastValidUpdateTimestamp = 0;
+    private int hits = 0;
 
-    private float playerSpeed = 1.5f;
+    private final float playerSpeed = 1.5f;
 
     public Player(String id, float x, float y, int width, int height, boolean isLocal) {
         super(x, y, width, height);
         this.id = id;
+        this.playerHealth = getHealthSprite(hits);
         this.targetX = x;
         this.targetY = y;
         this.isLocal = isLocal;
@@ -89,13 +93,10 @@ public class Player extends Entity {
 
 
     public void render(Graphics g) {
-
-
         g.drawImage(animations[playerAction][moveIndex], (int) x, (int) y, 200, 160, null);
         g.drawImage(baseEngImg, (int) x, (int) y, 200, 160, null);
         g.drawImage(img, (int) x, (int) y, 200, 160, null);
         g.drawImage(attackAnim[atkIndex], (int) x, (int) y, 200, 160, null);
-
     }
 
 
@@ -110,10 +111,8 @@ public class Player extends Entity {
             baseEngImg = ImageIO.read(istr2);
             cannonImg = ImageIO.read(istr3);
 
-
             animations = new BufferedImage[2][4];
             attackAnim = new BufferedImage[7];
-
 
             // MOVEMENT ANIMATION ===============================================================
             for (int i = 0; i < animations.length; i++) {
@@ -139,12 +138,10 @@ public class Player extends Entity {
                 e.printStackTrace();
             }
         }
-
     }
 
     public void updatePos() {
         long currentTime = System.currentTimeMillis();
-
         // Calculate time since the last update
         if (lastUpdateTime != 0) {
             long deltaTime = currentTime - lastUpdateTime; // In milliseconds
@@ -153,12 +150,10 @@ public class Player extends Entity {
                 velocityY = (y - lastY) / (deltaTime / 1000f); // Convert to seconds
             }
         }
-
         // Update last known position and time
         lastX = x;
         lastY = y;
         lastUpdateTime = currentTime;
-
         // Perform movement logic
         if (isLocal) {
             if (left && !right) x -= playerSpeed;
@@ -210,45 +205,6 @@ public class Player extends Entity {
         down = false;
     }
 
-    public void setAttacking(boolean attacking) {
-        this.attacking = attacking;
-    }
-
-    public boolean isLeft() {
-        return left;
-    }
-
-    public void setLeft(boolean left) {
-        this.left = left;
-    }
-
-    public boolean isUp() {
-        return up;
-    }
-
-    public void setUp(boolean up) {
-        this.up = up;
-    }
-
-    public boolean isRight() {
-        return right;
-    }
-
-    public void setRight(boolean right) {
-        this.right = right;
-    }
-
-    public boolean isDown() {
-        return down;
-    }
-
-    public void setDown(boolean down) {
-        this.down = down;
-    }
-
-    public void createBullet() {
-        bullets.add(new Bullet((int) x, (int) y));
-    }
 
     public void updateBullet() {
         Iterator<Bullet> iterator = bullets.iterator();
@@ -260,6 +216,12 @@ public class Player extends Entity {
                 iterator.remove();
             }
         }
+
+    }
+
+    public void updateHealth() {
+        getHits();
+        setPlayerHealth();
 
     }
 
@@ -339,6 +301,66 @@ public class Player extends Entity {
     public float getVelocityY() {
         return velocityY;
     }
+
+    public void setAttacking(boolean attacking) {
+        this.attacking = attacking;
+    }
+
+    public boolean isLeft() {
+        return left;
+    }
+
+    public void setLeft(boolean left) {
+        this.left = left;
+    }
+
+    public boolean isUp() {
+        return up;
+    }
+
+    public void setUp(boolean up) {
+        this.up = up;
+    }
+
+    public boolean isRight() {
+        return right;
+    }
+
+    public void setRight(boolean right) {
+        this.right = right;
+    }
+
+    public boolean isDown() {
+        return down;
+    }
+
+    public void setDown(boolean down) {
+        this.down = down;
+    }
+
+    public int getPlayerHealth() {
+        return this.playerHealth;
+    }
+
+    public void setPlayerHealth() {
+        this.playerHealth = getHealthSprite(hits);
+    }
+
+    public void setHits() {
+        this.hits += 1;
+    }
+
+    public int getHits() {
+        if (hits > 5) {
+            hits = 0;
+        }
+        return hits;
+    }
+
+    public void createBullet() {
+        bullets.add(new Bullet((int) x, (int) y));
+    }
+
 }
 
 

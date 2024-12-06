@@ -1,8 +1,9 @@
 package org.example;
 
-import org.audio.AudioLoader;
+import org.audio.AudioManager;
 import org.entities.Background;
 import org.entities.Player;
+import org.entities.UI;
 import org.json.JSONObject;
 import org.multiplayer.GameClient;
 import org.multiplayer.NetworkManager;
@@ -14,11 +15,11 @@ public class Game implements Runnable {
     public boolean IS_PAUSED = false;
     public final static int TILES_DEFAULT_SIZE = 48;
     public final static float SCALE = 1f;
-    public final static int TILE_HEIGHT = 14;
-    public final static int TILE_WIDTH = 29;
+    public final static double TILE_HEIGHT = 16;// 22.5 for 1080
+    public final static double TILE_WIDTH = 28.5; // 40 for 1920
     public final static int TILE_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
-    public final static int GAME_HEIGHT = TILE_SIZE * TILE_HEIGHT;
-    public final static int GAME_WIDTH = TILE_SIZE * TILE_WIDTH;
+    public final static int GAME_HEIGHT = (int) (TILE_SIZE * TILE_HEIGHT);
+    public final static int GAME_WIDTH = (int) (TILE_SIZE * TILE_WIDTH);
     private final int FPS_SET = 120;
     private final int UPS_SET = 200;
     private final GamePanel gamePanel;
@@ -32,7 +33,9 @@ public class Game implements Runnable {
     private NetworkManager networkManager;
     private long lastNetworkUpdate;
     private Menu menu;
-    private AudioLoader audioLoader;
+    private AudioManager audioManager;
+
+    private UI ui;
 
     public Game() {
         initClasses();
@@ -44,13 +47,17 @@ public class Game implements Runnable {
 
     private void initClasses() {
         try {
-            audioLoader = new AudioLoader();
+            //temporary Class
+            ui = new UI();
+            //
+
+            audioManager = new AudioManager();
+            audioManager.backgroundSFX();
             menu = new Menu();
             background = new Background(GAME_WIDTH, GAME_HEIGHT);
             player = new Player(UUIDGen(), 200, 200, 160, 300, true);
             System.out.println(player.getId());
 
-            audioLoader.playBackground();
             // Initialize NetworkManager
             networkManager = new NetworkManager("http://140.238.160.136:3000/");
 
@@ -123,16 +130,20 @@ public class Game implements Runnable {
     }
 
     public void update() {
-        background.update();
-        player.update();
-        player.updateBullet();
 
-        if (otherPlayer != null) {
-            otherPlayer.interpolatePos();
-            otherPlayer.update();
-            otherPlayer.updateBullet();
+
+        if (!IS_PAUSED) {
+            background.update();
+            player.update();
+            player.updateBullet();
+            player.updateHealth();
+
+            if (otherPlayer != null) {
+                otherPlayer.interpolatePos();
+                otherPlayer.update();
+                otherPlayer.updateBullet();
+            }
         }
-
         // Send player data at a lower frequency
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastNetworkUpdate >= 16) { // Every 50 ms
@@ -159,15 +170,19 @@ public class Game implements Runnable {
     public void render(Graphics g) {
         background.renderBackground(g);
         player.render(g);
-        player.drawBullets(g);
-        if (otherPlayer != null) {
-            otherPlayer.render(g);
-        }
+
+
         if (IS_PAUSED) {
             g.drawImage(menu.getMenuImage()[3], (int) (GAME_WIDTH / 2.5), GAME_HEIGHT / 8, 30, 20, null);
             g.drawImage(menu.getMenuImage()[1], (int) (GAME_WIDTH / 2.5), GAME_HEIGHT / 8, 300, 500, null);
-
+        } else {
+            player.drawBullets(g);
+            if (otherPlayer != null) {
+                otherPlayer.render(g);
+            }
+            ui.render(g, player.getPlayerHealth());
         }
+
     }
 
     @Override
@@ -231,8 +246,8 @@ public class Game implements Runnable {
         this.IS_PAUSED = state;
     }
 
-    public AudioLoader getAudioLoader() {
-        return audioLoader;
+    public AudioManager getAudioManager() {
+        return audioManager;
     }
 
     public int getGameState() {
