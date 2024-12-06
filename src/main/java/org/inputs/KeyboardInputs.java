@@ -7,10 +7,13 @@ import java.awt.event.KeyListener;
 
 public class KeyboardInputs implements KeyListener {
     private final GamePanel gamePanel;
+    boolean spacePressed = false;
+    boolean escapePressed = false;
 
 
     public KeyboardInputs(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
+
     }
 
     @Override
@@ -38,10 +41,9 @@ public class KeyboardInputs implements KeyListener {
                 gamePanel.getGame().getPlayer().setMoving(false);
                 break;
             case KeyEvent.VK_SPACE:
-                gamePanel.getGame().getPlayer().setAttacking(false);
+                spacePressed = false;
+                gamePanel.getGame().getPlayer().setAttacking(false);// Reset flag when space is released
                 break;
-
-
         }
     }
 
@@ -65,19 +67,35 @@ public class KeyboardInputs implements KeyListener {
                 gamePanel.getGame().getPlayer().setMoving(true);
                 break;
             case KeyEvent.VK_SPACE:
-                gamePanel.getGame().getPlayer().setAttacking(true);
-                gamePanel.getGame().getPlayer().createBullet();
-                gamePanel.getGame().getAudioManager().fireSFX("Canon_Fire");
-                gamePanel.getGame().getPlayer().setHits();
+                if (!spacePressed) {
+                    gamePanel.getGame().getPlayer().createBullet();
+                    gamePanel.getGame().getPlayer().setAttacking(true);
+                    gamePanel.getGame().getAudioManager().fireSFX("Canon_Fire");
+                    gamePanel.getGame().getPlayer().setHits();
+                    spacePressed = true;
+
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(100); // Adjust duration to match animation length
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
+                        gamePanel.getGame().getPlayer().setAttacking(false); // Reset attacking flag
+                    }).start();
+                }
+
                 break;
             case KeyEvent.VK_ESCAPE:
-                gamePanel.getGame().setGameState(true);
-                break;
-            case KeyEvent.VK_P:
-                gamePanel.getGame().setGameState(false);
-                System.out.println("P was pressed");
+                if (!escapePressed) {
+                    gamePanel.getGame().setGameState(true);
+                    escapePressed = true;
+                } else {
+                    gamePanel.getGame().setGameState(false);
+                    escapePressed = false;
+                }
                 break;
 
         }
     }
+
 }

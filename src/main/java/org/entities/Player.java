@@ -5,14 +5,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.constants.Constants.PlayerConstants.*;
 
 public class Player extends Entity {
 
-    ArrayList<Bullet> bullets = new ArrayList<>();
+    ConcurrentLinkedQueue<Bullet> bullets = new ConcurrentLinkedQueue<>();
     public int playerAction = IDLE;
     public int playerAttack = ATTACK_0;
     public int playerHealth = FULL_HEALTH;
@@ -43,7 +43,7 @@ public class Player extends Entity {
     private long lastValidUpdateTimestamp = 0;
     private int hits = 0;
 
-    private final float playerSpeed = 1.5f;
+    private final float playerSpeed = 1f;
 
     public Player(String id, float x, float y, int width, int height, boolean isLocal) {
         super(x, y, width, height);
@@ -54,6 +54,14 @@ public class Player extends Entity {
         this.isLocal = isLocal;
         loadAnimations();
         System.out.println();
+    }
+
+    public void toggleAttack() {
+        if (attacking) {
+            attacking = false;
+        } else {
+            attacking = true;
+        }
     }
 
     // Update method for updating the player
@@ -106,6 +114,7 @@ public class Player extends Entity {
         InputStream istr2 = getClass().getResourceAsStream("/Main_Ship_Engines_Base_Engine.png");
         InputStream istr3 = getClass().getResourceAsStream("/Main_Ship_Weapons_Auto_Cannon.png");
         try {
+            assert istr != null && istr1 != null && istr2 != null && istr3 != null;
             img = ImageIO.read(istr);
             engineImg = ImageIO.read(istr1);
             baseEngImg = ImageIO.read(istr2);
@@ -133,7 +142,14 @@ public class Player extends Entity {
             e.printStackTrace();
         } finally {
             try {
+                assert istr != null;
                 istr.close();
+                assert istr1 != null;
+                istr1.close();
+                assert istr2 != null;
+                istr2.close();
+                assert istr3 != null;
+                istr3.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -220,7 +236,7 @@ public class Player extends Entity {
     }
 
     public void updateHealth() {
-        getHits();
+        resetHits();
         setPlayerHealth();
 
     }
@@ -350,11 +366,10 @@ public class Player extends Entity {
         this.hits += 1;
     }
 
-    public int getHits() {
+    public void resetHits() {
         if (hits > 5) {
             hits = 0;
         }
-        return hits;
     }
 
     public void createBullet() {
