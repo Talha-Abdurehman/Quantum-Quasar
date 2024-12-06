@@ -19,7 +19,7 @@ public class Bullet {
     public Bullet(float x, float y) {
         this.x = x;
         this.y = y;
-        this.speed = 5;
+        this.speed = 2;
         loadBulletAnimation();
     }
 
@@ -72,7 +72,7 @@ public class Bullet {
     }
 
     public boolean isOffscreen() {
-        if (this.y == -300) {
+        if (this.y < -300) {
             return true;
         } else {
             return false;
