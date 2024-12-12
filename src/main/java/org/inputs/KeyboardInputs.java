@@ -9,6 +9,7 @@ public class KeyboardInputs implements KeyListener {
     private final GamePanel gamePanel;
     boolean spacePressed = false;
     boolean escapePressed = false;
+    boolean isReloading = false;
 
 
     public KeyboardInputs(GamePanel gamePanel) {
@@ -66,24 +67,41 @@ public class KeyboardInputs implements KeyListener {
                 gamePanel.getGame().getPlayer().setRight(true);
                 gamePanel.getGame().getPlayer().setMoving(true);
                 break;
+
             case KeyEvent.VK_SPACE:
-                if (!spacePressed) {
-                    gamePanel.getGame().getPlayer().createBullet();
-                    gamePanel.getGame().getPlayer().setAttacking(true);
-                    gamePanel.getGame().getAudioManager().fireSFX("Canon_Fire");
-                    gamePanel.getGame().getPlayer().setHits();
+                if (!spacePressed && !isReloading) {
                     spacePressed = true;
+                    if (gamePanel.getGame().getPlayer().getNumHits() < 5) {
+                        gamePanel.getGame().getPlayer().createBullet();
+                        gamePanel.getGame().getPlayer().setAttacking(true);
+                        gamePanel.getGame().getAudioManager().fireSFX("Canon_Fire");
+                        gamePanel.getGame().getPlayer().setHits();
 
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(100); // Adjust duration to match animation length
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-                        gamePanel.getGame().getPlayer().setAttacking(false); // Reset attacking flag
-                    }).start();
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                            gamePanel.getGame().getPlayer().setAttacking(false); // Reset attacking flag
+                        }).start();
+                    } else {
+                        isReloading = true;
+                        spacePressed = true;
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(1500);
+                                gamePanel.getGame().getPlayer().resetHits();
+
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            } finally {
+                                spacePressed = false;
+                                isReloading = false;
+                            }
+                        }).start();
+                    }
                 }
-
                 break;
             case KeyEvent.VK_ESCAPE:
                 if (!escapePressed) {

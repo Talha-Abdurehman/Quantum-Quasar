@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.constants.Constants.PlayerConstants.*;
 
@@ -15,7 +18,6 @@ public class Player extends Entity {
     ConcurrentLinkedQueue<Bullet> bullets = new ConcurrentLinkedQueue<>();
     public int playerAction = IDLE;
     public int playerAttack = ATTACK_0;
-    public int playerHealth = FULL_HEALTH;
     private BufferedImage img, engineImg, baseEngImg, cannonImg, bulletImg;
     private BufferedImage[][] animations;
     private BufferedImage[] attackAnim, bulletAnim;
@@ -48,20 +50,12 @@ public class Player extends Entity {
     public Player(String id, float x, float y, int width, int height, boolean isLocal) {
         super(x, y, width, height);
         this.id = id;
-        this.playerHealth = getHealthSprite(hits);
+        this.hits = getHealthSprite(hits);
         this.targetX = x;
         this.targetY = y;
         this.isLocal = isLocal;
         loadAnimations();
         System.out.println();
-    }
-
-    public void toggleAttack() {
-        if (attacking) {
-            attacking = false;
-        } else {
-            attacking = true;
-        }
     }
 
     // Update method for updating the player
@@ -85,11 +79,9 @@ public class Player extends Entity {
         } else
             playerAttack = ATTACK_0;
 
-        if (startAnim != playerAction)
+        if (startAnim != playerAction || startAtkAnim != playerAttack)
             resetAnimTick();
 
-        if (startAtkAnim != playerAttack)
-            resetAnimTick();
     }
 
     private void resetAnimTick() {
@@ -158,7 +150,7 @@ public class Player extends Entity {
 
     public void updatePos() {
         long currentTime = System.currentTimeMillis();
-        // Calculate time since the last update
+
         if (lastUpdateTime != 0) {
             long deltaTime = currentTime - lastUpdateTime; // In milliseconds
             if (deltaTime > 0) {
@@ -236,7 +228,6 @@ public class Player extends Entity {
     }
 
     public void updateHealth() {
-        resetHits();
         setPlayerHealth();
 
     }
@@ -355,21 +346,37 @@ public class Player extends Entity {
     }
 
     public int getPlayerHealth() {
-        return this.playerHealth;
+        return this.hits;
     }
 
     public void setPlayerHealth() {
-        this.playerHealth = getHealthSprite(hits);
+        this.hits = getHealthSprite(hits);
     }
 
     public void setHits() {
-        this.hits += 1;
+        this.hits++;
     }
 
     public void resetHits() {
-        if (hits > 5) {
-            hits = 0;
-        }
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        Runnable task = () -> {
+            if (hits > 0) {
+                hits--; // Decrement hits
+                System.out.println("Hits: " + hits);
+            }
+            if (hits == 0) {
+                scheduler.shutdown(); // Stop scheduler when hits reach 0
+                System.out.println("Reload complete!");
+            }
+        };
+
+        // Schedule the task to run every 375 milliseconds
+        scheduler.scheduleAtFixedRate(task, 0, 375, TimeUnit.MILLISECONDS);
+    }
+
+    public int getNumHits() {
+        return this.hits;
     }
 
     public void createBullet() {
