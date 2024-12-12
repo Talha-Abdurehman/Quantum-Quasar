@@ -22,12 +22,13 @@ public class Constants {
 
         public static int getHealthSprite(int hit) {
             return switch (hit) {
+                case 0 -> FULL_HEALTH;
                 case 1 -> HIT1;
                 case 2 -> HIT2;
                 case 3 -> HIT3;
                 case 4 -> HIT4;
                 case 5 -> DEAD;
-                default -> FULL_HEALTH;
+                default -> throw new IllegalStateException("Unexpected value: " + hit);
             };
         }
 
